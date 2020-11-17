@@ -9,6 +9,34 @@ import org.apache.commons.lang3.StringUtils;
 
 public class Main {
 
+  // Filter "Alyssa" doesn't have a default action
+  // :Alyssa - [0:0]
+  // Unconditional jump to Alyssa filter
+  // -A INPUT -j Alyssa
+  // -A FORWARD -j Alyssa
+
+  // -A FORWARD -p tcp -m mac --mac-source 08:84:9D:0C:5D:39 -m webstr --url hulu -j REJECT --reject-with tcp-reset -m time --kerneltz --timestart 07:45 --timestop 11:00 --weekdays Mon,Tue,Wed,Thu,Fri
+  // -j RETURN
+  // Filter "Joel" doesn't have a default action
+  // :Joel - [0:0]
+  // Unconditional jump to Joel filter
+  // -A INPUT -j Joel
+  // -A FORWARD -j Joel
+
+  // -A Alyssa -p tcp -m mac ! --mac-source 08:84:9D:0C:5D:39 -j RETURN
+  // -A Alyssa -p tcp -m time --kerneltz --timestart 18:45 --timestop 18:46 --weekdays Mon,Tue,Wed,Thu,Fri -j RETURN
+  // -A Alyssa -p tcp -m webstr --url hulu -j REJECT --reject-with tcp-reset
+  // -A Alyssa -p tcp -m webstr --url hulu -j REJECT --reject-with tcp-reset
+  // -A Alyssa -p tcp -m webstr --url hulu -j REJECT --reject-with tcp-reset
+  // -A Alyssa -p tcp -m webstr --url hulu -j REJECT --reject-with tcp-reset
+
+  // iptables -N Adam
+  // iptables -I INPUT -j Adam
+  // iptables -I FORWARD -j Adam
+  // iptables -A Adam -p tcp -m mac ! --mac-source f4:5c:89:9c:eb:b7 -j RETURN
+  // iptables -A Adam -p tcp -m time --kerneltz --timestart 18:45 --timestop 18:48 --weekdays Mon,Tue,Wed,Thu,Fri -j REJECT
+
+
   private final Properties properties;
   private final Device tv1;
   private final Device tv2;
@@ -39,7 +67,9 @@ public class Main {
       rules.add(blockDiscordDuringSchool);
       rules.add(blockDisneyDuringSchool);
     }
-    
+
+
+
     writeToFile("Joel", rules);
 
     rules.clear();
@@ -62,17 +92,45 @@ public class Main {
 
   private void writeToFile(final String name, final ArrayList<Rule> rules) {
     try (FileWriter fileWriter = new FileWriter(name.toLowerCase() + ".sh")) {
+
       fileWriter.write("# " + StringUtils.repeat('#', 70) + "\n");
       fileWriter.write("# " + StringUtils.center(" " + name + " ", 70, '#') + "\n");
       fileWriter.write("# " + StringUtils.repeat('#', 70) + "\n");
 
-      for (Rule rule : rules) {
-        fileWriter.write(rule.toString());
-      }
+      rules.stream().map(rule -> rule.getDevice()).distinct().forEach(device -> {
+
+        rules.stream().filter(rule -> rule.getDevice().equals(device)).forEach(rule2 -> {
+          try {
+            String firstLine = "#".repeat(10) + "  Device:  " + device.toString() + "  " + "#".repeat(10);
+            fileWriter.write(firstLine + System.lineSeparator());
+
+            // iptables -N Adam
+            // iptables -I INPUT -j Adam
+            // iptables -I FORWARD -j Adam
+            // iptables -A Adam -p tcp -m mac ! --mac-source f4:5c:89:9c:eb:b7 -j RETURN
+            // iptables -A Adam -p tcp -m time --kerneltz --timestart 18:45 --timestop 18:48 --weekdays Mon,Tue,Wed,Thu,Fri -j REJECT
+            String filterName = sanitize(device.toString());
+            fileWriter.write("iptables -N " + filterName + System.lineSeparator());
+            fileWriter.write("iptables -I INPUT -j " + filterName + System.lineSeparator());
+            fileWriter.write("iptables -I FORWARD -j " + filterName + System.lineSeparator());
+            fileWriter.write("iptables -A " + filterName + " -p tcp -m mac ! --mac-source " + device.getMacAddress() + " -j RETURN" + System.lineSeparator());
+
+            fileWriter.write(rule2.toString());
+          }
+          catch (IOException e) {
+            e.printStackTrace();
+          }
+        });
+      });
+
     }
     catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  protected String sanitize(final String str) {
+    return str.replaceAll("[-'\"_():]", "").replaceAll(" ", "_");
   }
 
   private Schedule setUpAlyssasSchedule() {
