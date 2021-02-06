@@ -1,11 +1,9 @@
-package com.adamkoch.iptables;
+package com.adamkoch.iptables
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Test
 
-public class RouterTest {
-
-  @Test
-  public void test() {
-
-  }
+class RouterTest {
+    @Test
+    fun test() {
+    }
 }

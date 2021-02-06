@@ -1,16 +1,11 @@
-package com.adamkoch.iptables.matches;
+package com.adamkoch.iptables.matches
 
-import java.time.temporal.ChronoField;
-import java.time.temporal.Temporal;
+import java.time.temporal.Temporal
+import com.adamkoch.iptables.matches.DateTimeExtensionMatchOption
 
-public class EndDateTimeExtensionMatchOption extends DateTimeExtensionMatchOption {
-
-  public EndDateTimeExtensionMatchOption(final Temporal endTemporal) {
-    super(endTemporal);
-  }
-
-  public String asString() {
-    return super.asString(false);
-  }
-
+class EndDateTimeExtensionMatchOption(endTemporal: Temporal) :
+    DateTimeExtensionMatchOption(endTemporal) {
+    override fun asString(): String {
+        return super.asString(false)
+    }
 }

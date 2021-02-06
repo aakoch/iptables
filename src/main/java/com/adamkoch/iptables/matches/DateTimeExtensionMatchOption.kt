@@ -1,56 +1,37 @@
-package com.adamkoch.iptables.matches;
+package com.adamkoch.iptables.matches
 
-import java.time.Instant;
-import java.time.temporal.ChronoField;
-import java.time.temporal.Temporal;
+import java.time.Instant
+import java.time.temporal.ChronoField
+import java.time.temporal.Temporal
+import java.util.*
 
-public abstract class DateTimeExtensionMatchOption extends GenericExtensionMatchOption {
-
-  private final Temporal temporal;
-  private boolean useKernelTZ;
-
-  protected DateTimeExtensionMatchOption(final Temporal temporal) {
-    this.temporal = temporal;
-    useKernelTZ = true;
-  }
-
-  public void setUseKernelTZ(boolean newValue) {
-    useKernelTZ = newValue;
-  }
-
-  protected String asString(final boolean startOrStop) {
-
-    final String type;
-    if (temporal.isSupported(ChronoField.YEAR) || temporal instanceof Instant) {
-      type = "date";
-    }
-    else {
-      type = "time";
+abstract class DateTimeExtensionMatchOption protected constructor(protected val temporal: Temporal) :
+    GenericExtensionMatchOption(Arrays.asList("--date", "--time")) {
+    private var useKernelTZ = true
+    fun setUseKernelTZ(newValue: Boolean) {
+        useKernelTZ = newValue
     }
 
-    final String temporalString = temporal.toString();
-
-    StringBuilder sb = new StringBuilder();
-    sb.append("--").append(type);
-
-    if (startOrStop) {
-      sb.append("start ");
+    protected fun asString(startOrStop: Boolean): String {
+        val type: String
+        type = if (temporal.isSupported(ChronoField.YEAR) || temporal is Instant) {
+            "date"
+        } else {
+            "time"
+        }
+        val temporalString = temporal.toString()
+        val sb = StringBuilder()
+        sb.append("--").append(type)
+        if (startOrStop) {
+            sb.append("start ")
+        } else {
+            sb.append("stop ")
+        }
+        sb.append(temporalString)
+        if (temporalString.endsWith("Z") && useKernelTZ) {
+            sb.deleteCharAt(sb.length - 1)
+            sb.append(" --kerneltz")
+        }
+        return sb.toString()
     }
-    else {
-      sb.append("stop ");
-    }
-
-    sb.append(temporalString);
-
-    if (temporalString.endsWith("Z") && useKernelTZ) {
-      sb.deleteCharAt(sb.length() - 1);
-      sb.append(" --kerneltz");
-    }
-
-    return sb.toString();
-  }
-
-  protected Temporal getTemporal() {
-    return temporal;
-  }
 }

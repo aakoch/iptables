@@ -1,34 +1,23 @@
-package com.adamkoch.iptables.matches;
+package com.adamkoch.iptables.matches
 
 /**
- * For use with {@link StringExtensionMatch}
+ * For use with [StringExtensionMatch]
  *
  * @author aakoch
  * @since 0.1.0
  */
-public class AlgorithmExtensionMatchOption extends GenericExtensionMatchOption {
+class AlgorithmExtensionMatchOption @JvmOverloads constructor(private val algorithm: String = BOYER_MOORE) :
+    GenericExtensionMatchOption("--algo") {
+    override fun asString(): String {
+        return "--algo $algorithm"
+    }
 
-  public static final String BOYER_MOORE = "bm";
-  public static final String KNUTH_PRATT_MORRIS = "kmp";
-
-  @SuppressWarnings("StaticVariableOfConcreteClass")
-  public static final AlgorithmExtensionMatchOption BOYER_MOORE_OPTION = new AlgorithmExtensionMatchOption(BOYER_MOORE);
-
-  @SuppressWarnings("StaticVariableOfConcreteClass")
-  public static final AlgorithmExtensionMatchOption KNUTH_PRATT_MORRIS_OPTION = new AlgorithmExtensionMatchOption(
-      KNUTH_PRATT_MORRIS);
-  private final String algorithm;
-
-  public AlgorithmExtensionMatchOption() {
-    this(BOYER_MOORE);
-  }
-
-  public AlgorithmExtensionMatchOption(String algorithm) {
-    this.algorithm = algorithm;
-  }
-
-  @Override
-  public String asString() {
-    return "--algo " + algorithm;
-  }
+    companion object {
+        const val BOYER_MOORE = "bm"
+        const val KNUTH_PRATT_MORRIS = "kmp"
+        val BOYER_MOORE_OPTION = AlgorithmExtensionMatchOption(BOYER_MOORE)
+        val KNUTH_PRATT_MORRIS_OPTION = AlgorithmExtensionMatchOption(
+            KNUTH_PRATT_MORRIS
+        )
+    }
 }

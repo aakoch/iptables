@@ -1,27 +1,14 @@
-package com.adamkoch.iptables.matches;
-
-import java.time.temporal.Temporal;
+package com.adamkoch.iptables.matches
 
 /**
- * Used with the {@link StringExtensionMatch} to specify the end offset.
+ * Used with the [StringExtensionMatch] to specify the end offset.
  *
  * @author aakoch
  * @since 0.1.0
  */
-public class ToOffsetStringExtensionMatchOption extends GenericExtensionMatchOption {
-
-  private final int offset;
-
-  public ToOffsetStringExtensionMatchOption() {
-    this(0);
-  }
-
-  public ToOffsetStringExtensionMatchOption(int offset) {
-    this.offset = offset;
-  }
-
-  @Override
-  public String asString() {
-    return "--to " + offset;
-  }
+class ToOffsetStringExtensionMatchOption @JvmOverloads constructor(private val offset: Int = 0) :
+    GenericExtensionMatchOption("--to") {
+    override fun asString(): String {
+        return "--to $offset"
+    }
 }

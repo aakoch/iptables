@@ -1,79 +1,84 @@
-package com.adamkoch.iptables;
+package com.adamkoch.iptables
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.adamkoch.iptables.ActionComponent.*
+import com.adamkoch.iptables.Util.sanitize
+import com.adamkoch.iptables.matches.MacAddressMatch
+import com.adamkoch.iptables.matches.Match
+import com.adamkoch.iptables.matches.WebStringExtensionMatch
+import com.adamkoch.iptables.objects.MacAddress
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
-import com.adamkoch.iptables.ActionComponent.AcceptActionComponent;
-import com.adamkoch.iptables.ActionComponent.DropActionComponent;
-import com.adamkoch.iptables.ActionComponent.RejectActionComponent;
-import com.adamkoch.iptables.ActionComponent.ReturnActionComponent;
-import com.adamkoch.iptables.matches.MacAddressMatch;
-import com.adamkoch.iptables.matches.Match;
-import com.adamkoch.iptables.matches.WebStringExtensionMatch;
-import com.adamkoch.iptables.objects.MacAddress;
-import org.junit.jupiter.api.Test;
+internal class ChainTest {
+    @Test
+    fun basic() {
+        val chain = Chain(INVALID_CHAIN_NAME)
+        chain.add(macAddrRule)
+        chain.add(webstrRule)
+        Assertions.assertEquals(
+            "Adams_Computer -m mac --mac-source 00:00:00:a1:2b:cc -j DROP" + System.lineSeparator()
+                    + "Adams_Computer -m webstr --url keyword -j REJECT --reject-with tcp-reset",
+            chain.toString()
+        )
+    }
 
-@SuppressWarnings("DuplicateStringLiteralInspection")
-class ChainTest {
+    @Test
+    fun inverse() {
+        val chain = Chain(INVALID_CHAIN_NAME)
+        chain.add(allowMacAddrRule)
+        chain.add(webstrRule)
+        Assertions.assertEquals(
+            "Adams_Computer -m mac --mac-source 00:00:00:a1:2b:cc -j ACCEPT" + System.lineSeparator()
+                    + "Adams_Computer -m webstr --url keyword -j REJECT --reject-with tcp-reset",
+            chain.toString()
+        )
+    }
 
-  public static final String INVALID_CHAIN_NAME = "Adam's Computer";
-  public static final String SANITIZED_CHAIN_NAME = Util.sanitize(INVALID_CHAIN_NAME);
-
-  @Test
-  void basic() {
-    Chain chain = new Chain(INVALID_CHAIN_NAME);
-    chain.add(getMacAddrRule());
-    chain.add(getWebstrRule());
-    assertEquals("Adams_Computer -m mac --mac-source 00:00:00:a1:2b:cc -j DROP" + System.lineSeparator()
-                     + "Adams_Computer -m webstr --url keyword -j REJECT --reject-with tcp-reset", chain.toString());
-  }
-
-  @Test
-  void inverse() {
-    Chain chain = new Chain(INVALID_CHAIN_NAME);
-    chain.add(getAllowMacAddrRule());
-    chain.add(getWebstrRule());
-    assertEquals("Adams_Computer -m mac --mac-source 00:00:00:a1:2b:cc -j ACCEPT" + System.lineSeparator()
-                     + "Adams_Computer -m webstr --url keyword -j REJECT --reject-with tcp-reset", chain.toString());
-  }
-
-  @Test
-  void shortCircuit() {
-    Chain chain = new Chain(INVALID_CHAIN_NAME);
-    chain.add(getReturnWhenNotMacAddrRule());
-    chain.add(getWebstrRule());
-
-    assertEquals("Adams_Computer -m mac ! --mac-source 00:00:00:a1:2b:cc -j RETURN" + System.lineSeparator()
-                     + "Adams_Computer -m webstr --url keyword -j REJECT --reject-with tcp-reset", chain.toString());
+    @Test
+    fun shortCircuit() {
+        val chain = Chain(INVALID_CHAIN_NAME)
+        chain.add(returnWhenNotMacAddrRule)
+        chain.add(webstrRule)
+        Assertions.assertEquals(
+            "Adams_Computer -m mac ! --mac-source 00:00:00:a1:2b:cc -j RETURN" + System.lineSeparator()
+                    + "Adams_Computer -m webstr --url keyword -j REJECT --reject-with tcp-reset",
+            chain.toString()
+        )
 
 
-    // -A Alyssa -p tcp -m mac ! --mac-source 00:00:00:00:00:00 -j RETURN
-    // -A Alyssa -p tcp -m time --kerneltz --timestart 18:45 --timestop 18:46 --weekdays Mon,Tue,Wed,Thu,Fri -j RETURN
-    // -A Alyssa -p tcp -m webstr --url hulu -j REJECT --reject-with tcp-reset
+        // -A Alyssa -p tcp -m mac ! --mac-source 00:00:00:00:00:00 -j RETURN
+        // -A Alyssa -p tcp -m time --kerneltz --timestart 18:45 --timestop 18:46 --weekdays Mon,Tue,Wed,Thu,Fri -j RETURN
+        // -A Alyssa -p tcp -m webstr --url hulu -j REJECT --reject-with tcp-reset
+    }
 
-  }
+    private val webstrRule: Rule
+        private get() {
+            val rule = Rule(RejectActionComponent())
+            val match: Match = WebStringExtensionMatch("keyword")
+            rule.addMatch(match)
+            return rule
+        }
+    private val macAddrRule: Rule
+        private get() {
+            val rule = Rule(DropActionComponent())
+            rule.addMatch(MacAddressMatch(MacAddress.DUMMY))
+            return rule
+        }
+    private val allowMacAddrRule: Rule
+        private get() {
+            val rule = Rule(AcceptActionComponent())
+            rule.addMatch(MacAddressMatch(MacAddress.DUMMY))
+            return rule
+        }
+    private val returnWhenNotMacAddrRule: Rule
+        private get() {
+            val rule = Rule(ReturnActionComponent())
+            rule.addMatch(MacAddressMatch(MacAddress.DUMMY).not())
+            return rule
+        }
 
-  private Rule getWebstrRule() {
-    Rule rule = new Rule(new RejectActionComponent());
-    Match match = new WebStringExtensionMatch("keyword");
-    rule.addMatch(match);
-    return rule;
-  }
-
-  private Rule getMacAddrRule() {
-    Rule rule = new Rule(new DropActionComponent());
-    rule.addMatch(new MacAddressMatch(MacAddress.DUMMY));
-    return rule;
-  }
-
-  private Rule getAllowMacAddrRule() {
-    Rule rule = new Rule(new AcceptActionComponent());
-    rule.addMatch(new MacAddressMatch(MacAddress.DUMMY));
-    return rule;
-  }
-
-  private Rule getReturnWhenNotMacAddrRule() {
-    Rule rule = new Rule(new ReturnActionComponent());
-    rule.addMatch(new MacAddressMatch(MacAddress.DUMMY).not());
-    return rule;
-  }
+    companion object {
+        const val INVALID_CHAIN_NAME = "Adam's Computer"
+        val SANITIZED_CHAIN_NAME = sanitize(INVALID_CHAIN_NAME)
+    }
 }

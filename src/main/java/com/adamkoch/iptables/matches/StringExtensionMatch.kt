@@ -49,7 +49,7 @@ class StringExtensionMatch(private val keyword: String) : ExtensionMatch("string
         return newStringExtensionMatch
     }
 
-    fun withAlgorithm(algorithm: String?): StringExtensionMatch {
+    fun withAlgorithm(algorithm: String): StringExtensionMatch {
         val newStringExtensionMatch = copy()
         newStringExtensionMatch.with(AlgorithmExtensionMatchOption(algorithm))
         return newStringExtensionMatch

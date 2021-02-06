@@ -1,9 +1,10 @@
-package com.adamkoch.iptables.matches;
+package com.adamkoch.iptables.matches
 
-import com.adamkoch.annotations.Unstable;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import com.adamkoch.annotations.Unstable
+import kotlin.jvm.JvmOverloads
+import com.adamkoch.iptables.matches.ExtensionMatchOption
+import java.util.Objects
+import java.util.HashSet
 
 /**
  * This class hasn't stabilized yet.
@@ -12,49 +13,41 @@ import java.util.Set;
  * @since 0.1.0
  */
 @Unstable
-class GenericExtensionMatchOption implements ExtensionMatchOption {
+open class GenericExtensionMatchOption @JvmOverloads constructor(
+    flags: MutableList<String>
+) : ExtensionMatchOption {
+    // I might remove this
+    private val possibleValues: MutableSet<String>
+    private var flags: MutableList<String>
 
-  // I might remove this
-  private final Set<String> possibleValues;
-  private String[] flags;
-  // I might remove this
-  private String defaultValue;
+    // I might remove this
+    var defaultValue: String? = null
+        private set
 
-  public GenericExtensionMatchOption() {
-    this(new String[0]);
-  }
+    constructor(flag: String) : this(mutableListOf<String>(flag)) {}
 
-  public GenericExtensionMatchOption(final String flag) {
-    this(new String[]{flag});
-  }
+    fun addDefault(defaultValue: String) {
+        Objects.requireNonNull(defaultValue)
+        this.defaultValue = defaultValue
+    }
 
-  public GenericExtensionMatchOption(final String[] flags) {
-    Objects.requireNonNull(flags);
-    this.flags = flags;
-    possibleValues = new HashSet<>();
-  }
+    fun addFlag(vararg flags: String) {
+        Objects.requireNonNull(flags)
+        this.flags.addAll(flags)
+    }
 
-  public void addDefault(final String defaultValue) {
-    Objects.requireNonNull(defaultValue);
-    this.defaultValue = defaultValue;
-  }
+    fun addValue(value: String) {
+        Objects.requireNonNull(value)
+        possibleValues.add(value)
+    }
 
-  public void addFlag(final String... flags) {
-    Objects.requireNonNull(flags);
-    this.flags = flags;
-  }
+    override fun asString(): String {
+        return flags[0]
+    }
 
-  public void addValue(final String value) {
-    Objects.requireNonNull(value);
-    possibleValues.add(value);
-  }
-
-  public String getDefaultValue() {
-    return defaultValue;
-  }
-
-  @Override
-  public String asString() {
-    return flags[0];
-  }
+    init {
+        Objects.requireNonNull(flags)
+        this.flags = flags
+        possibleValues = HashSet()
+    }
 }

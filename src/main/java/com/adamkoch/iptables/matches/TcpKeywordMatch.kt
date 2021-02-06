@@ -8,5 +8,5 @@ import java.util.List
  * @author aakoch
  * @since 0.1.0
  */
-class TcpKeywordMatch(keyword: String?) :
+class TcpKeywordMatch(keyword: String) :
     AggregatedMatch(List.of(ProtocolMatch.TCP, WebStringExtensionMatch(keyword)))

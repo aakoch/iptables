@@ -1,18 +1,16 @@
-package com.adamkoch.iptables.matches;
+package com.adamkoch.iptables.matches
 
 /**
  * @author aakoch
  * @since 0.1.0
  */
-public class IgnoreCaseExtensionMatchOption extends GenericExtensionMatchOption {
+class IgnoreCaseExtensionMatchOption private constructor() :
+    GenericExtensionMatchOption("--icase") {
+    override fun asString(): String {
+        return "--icase"
+    }
 
-  public static final IgnoreCaseExtensionMatchOption DEFAULT = new IgnoreCaseExtensionMatchOption();
-
-  private IgnoreCaseExtensionMatchOption() {
-  }
-
-  @Override
-  public String asString() {
-    return "--icase";
-  }
+    companion object {
+        val DEFAULT = IgnoreCaseExtensionMatchOption()
+    }
 }

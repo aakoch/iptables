@@ -1,15 +1,11 @@
-package com.adamkoch.iptables.matches;
+package com.adamkoch.iptables.matches
 
-import java.time.temporal.Temporal;
+import java.time.temporal.Temporal
+import com.adamkoch.iptables.matches.DateTimeExtensionMatchOption
 
-public class StartDateTimeExtensionMatchOption extends DateTimeExtensionMatchOption {
-
-  public StartDateTimeExtensionMatchOption(final Temporal startTemporal) {
-    super(startTemporal);
-  }
-
-  @Override
-  public String asString() {
-    return super.asString(true);
-  }
+class StartDateTimeExtensionMatchOption(startTemporal: Temporal) :
+    DateTimeExtensionMatchOption(startTemporal) {
+    override fun asString(): String {
+        return super.asString(true)
+    }
 }
