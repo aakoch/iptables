@@ -1,15 +1,12 @@
-package com.adamkoch.iptables;
+package com.adamkoch.iptables
 
-import com.adamkoch.annotations.Unstable;
-import com.adamkoch.iptables.matches.MacAddressMatch;
-import com.adamkoch.iptables.matches.Match;
-import com.adamkoch.iptables.matches.TcpKeywordMatch;
-import com.adamkoch.iptables.matches.Udp1KeywordMatch;
-import com.adamkoch.iptables.matches.Udp2KeywordMatch;
-import com.adamkoch.iptables.objects.MacAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.adamkoch.annotations.Unstable
+import com.adamkoch.iptables.ActionComponent.RejectActionComponent
+import com.adamkoch.iptables.matches.*
+import com.adamkoch.iptables.objects.MacAddress
+import java.util.*
+import java.util.function.Consumer
+import java.util.stream.Collectors
 
 /**
  *
@@ -17,40 +14,30 @@ import java.util.stream.Collectors;
  * @author aakoch
  */
 @Unstable
-public class RuleSet {
+class RuleSet(
+    private val keyword: String, private val chainName: String, macAddress: MacAddress?,
+    routerIpAddress: String
+) {
+    var rules: MutableList<Rule> = ArrayList()
+    override fun toString(): String {
+        return rules.stream().map { obj: Rule -> obj.asString() }
+            .collect(Collectors.joining(System.lineSeparator()))
+    }
 
-  private final String keyword;
-  private final String chainName;
-  List<Rule> rules = new ArrayList<>();
-
-  public RuleSet(final String keyword, final String chainName, final MacAddress macAddress,
-      final String routerIpAddress) {
-    this.keyword = keyword;
-    this.chainName = chainName;
-
-    final TcpKeywordMatch keywordMatchingComponent1 = new TcpKeywordMatch(keyword);
-    final Match keywordMatch2 = new Udp1KeywordMatch(keyword);
-    final Match keywordMatch3 = new Udp2KeywordMatch(keyword, routerIpAddress +  "/32");
-    final MacAddressMatch macAddressMatchingComponent = new MacAddressMatch(macAddress);
-
-    Rule rule1 = new Rule(new ActionComponent.RejectActionComponent());
-    rule1.addMatch(keywordMatchingComponent1);
-    rules.add(rule1);
-
-    Rule rule2 = new Rule(new ActionComponent.RejectActionComponent());
-    rule2.addMatch(keywordMatch2);
-    rules.add(rule2);
-
-    Rule rule3 = new Rule(new ActionComponent.RejectActionComponent());
-    rule3.addMatch(keywordMatch3);
-    rules.add(rule3);
-
-    rules.forEach(rule -> rule.addMatch(macAddressMatchingComponent));
-
-  }
-
-  @Override
-  public String toString() {
-    return rules.stream().map(Rule::asString).collect(Collectors.joining(System.lineSeparator()));
-  }
+    init {
+        val keywordMatchingComponent1 = TcpKeywordMatch(keyword)
+        val keywordMatch2: Match = Udp1KeywordMatch(keyword)
+        val keywordMatch3: Match = Udp2KeywordMatch(keyword, "$routerIpAddress/32")
+        val macAddressMatchingComponent = MacAddressMatch(macAddress!!)
+        val rule1 = Rule(RejectActionComponent())
+        rule1.addMatch(keywordMatchingComponent1)
+        rules.add(rule1)
+        val rule2 = Rule(RejectActionComponent())
+        rule2.addMatch(keywordMatch2)
+        rules.add(rule2)
+        val rule3 = Rule(RejectActionComponent())
+        rule3.addMatch(keywordMatch3)
+        rules.add(rule3)
+        rules.forEach(Consumer { rule: Rule -> rule.addMatch(macAddressMatchingComponent) })
+    }
 }

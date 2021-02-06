@@ -1,9 +1,8 @@
-package com.adamkoch.iptables;
+package com.adamkoch.iptables
 
-import com.adamkoch.annotations.Unstable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringJoiner;
+import com.adamkoch.annotations.Unstable
+import java.util.*
+import java.util.function.Consumer
 
 /**
  *
@@ -11,28 +10,23 @@ import java.util.StringJoiner;
  * @author aakoch
  */
 @Unstable
-public class TimeSchedule {
+class TimeSchedule {
+    private val timeRanges: MutableList<TimeRange>
+    fun add(daySchedule: TimeRange) {
+        timeRanges.add(daySchedule)
+    }
 
-  private final List<TimeRange> timeRanges;
+    fun getTimeRanges(): List<TimeRange> {
+        return timeRanges
+    }
 
-  public TimeSchedule() {
-    timeRanges = new ArrayList<>();
-  }
+    override fun toString(): String {
+        val sj = StringJoiner(", ")
+        timeRanges.forEach(Consumer { daySchedule: TimeRange -> sj.add(daySchedule.toString()) })
+        return sj.toString()
+    }
 
-  public void add(final TimeRange daySchedule) {
-    timeRanges.add(daySchedule);
-  }
-
-  public List<TimeRange> getTimeRanges() {
-    return timeRanges;
-  }
-
-  @Override
-  public String toString() {
-    StringJoiner sj = new StringJoiner(", ");
-    timeRanges.forEach(daySchedule -> {
-      sj.add(daySchedule.toString());
-    });
-    return sj.toString();
-  }
+    init {
+        timeRanges = ArrayList()
+    }
 }

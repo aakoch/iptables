@@ -1,8 +1,8 @@
-package com.adamkoch.iptables;
+package com.adamkoch.iptables
 
-import com.adamkoch.annotations.Unstable;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+import com.adamkoch.annotations.Unstable
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 /**
  *
@@ -10,28 +10,20 @@ import java.time.format.DateTimeFormatter;
  * @author aakoch
  */
 @Unstable
-public class TimeRange {
+class TimeRange(val startTime: LocalTime, val endTime: LocalTime) {
+    fun getStartTimeString(): String {
+        return startTime.format(FORMATTER)
+    }
 
-  public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+    fun getEndTimeString(): String {
+        return endTime.format(FORMATTER)
+    }
 
-  private final LocalTime startTime;
-  private final LocalTime endTime;
+    override fun toString(): String {
+        return getStartTimeString() + "-" + getEndTimeString()
+    }
 
-  public TimeRange(final LocalTime startTime, final LocalTime endTime) {
-    this.startTime = startTime;
-    this.endTime = endTime;
-  }
-
-  public String getStartTime() {
-    return startTime.format(FORMATTER);
-  }
-
-  public String getEndTime() {
-    return endTime.format(FORMATTER);
-  }
-
-  @Override
-  public String toString() {
-    return getStartTime() + "-" + getEndTime();
-  }
+    companion object {
+        val FORMATTER = DateTimeFormatter.ofPattern("HH:mm")
+    }
 }

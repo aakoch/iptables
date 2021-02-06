@@ -1,39 +1,33 @@
-package com.adamkoch.iptables;
+package com.adamkoch.iptables
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*
 
 /**
  *
  * @since 0.1.0
  * @author aakoch
  */
-public class DaySchedule {
+class DaySchedule(val day: String) {
+    private val timeRanges: MutableList<TimeRange>
+    private val marked = false
+    fun add(timeRange: TimeRange) {
+        timeRanges.add(timeRange)
+    }
 
-  private final String day;
-  private final List<TimeRange> timeRanges;
-  private boolean marked;
+    fun getTimeRanges(): List<TimeRange> {
+        timeRanges.sortWith({ range1: TimeRange, range2: TimeRange ->
+            range2.endTime.compareTo(
+                range1.startTime
+            )
+        })
+        return timeRanges
+    }
 
-  public DaySchedule(String day) {
-    this.day = day;
-    this.timeRanges = new ArrayList<>();
-  }
+    override fun toString(): String {
+        return day + timeRanges
+    }
 
-  public void add(final TimeRange timeRange) {
-    this.timeRanges.add(timeRange);
-  }
-
-  public List<TimeRange> getTimeRanges() {
-    timeRanges.sort((range1, range2) -> range2.getEndTime().compareTo(range1.getStartTime()));
-    return timeRanges;
-  }
-
-  public String getDay() {
-    return day;
-  }
-
-  @Override
-  public String toString() {
-    return day + timeRanges;
-  }
+    init {
+        timeRanges = ArrayList()
+    }
 }

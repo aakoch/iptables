@@ -1,9 +1,10 @@
-package com.adamkoch.iptables;
+package com.adamkoch.iptables
 
-import com.adamkoch.annotations.Unstable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.adamkoch.annotations.Unstable
+import java.util.stream.Collectors
+import java.util.Optional
+import com.adamkoch.iptables.TimeRange
+import java.util.ArrayList
 
 /**
  *
@@ -11,20 +12,12 @@ import java.util.stream.Collectors;
  * @author aakoch
  */
 @Unstable
-public class Chain {
-
-  private final String name;
-  private final List<Rule> rules;
-
-  public Chain(final String name) {
-    this.name = name;
-    this.rules = new ArrayList<>();
-  }
-
-  @Override
-  public String toString() {
-    String sanitized = Util.sanitize(this.name);
-    return rules.stream().map(rule -> sanitized + " " + rule.asString()).collect(Collectors.joining(System.lineSeparator()));
+class Chain(val name: String) {
+    private val rules: MutableList<Rule>
+    override fun toString(): String {
+        val sanitized = Util.sanitize(name)
+        return rules.stream().map { rule: Rule -> sanitized + " " + rule.asString() }
+            .collect(Collectors.joining(System.lineSeparator()))
 
 //    StringBuilder timeScheduleString = new StringBuilder();
 //    timeSchedule.ifPresent(ts -> {
@@ -43,17 +36,17 @@ public class Chain {
 //        timeScheduleString.toString() +
 ////    "iptables -A " + sanitized + " -p tcp -m time --kerneltz --timestart 18:45 --timestop 18:48 --weekdays Mon,Tue,Wed,Thu,Fri -j REJECT\n"
 //        "iptables -A " + sanitized + " -j RETURN\n";
-  }
+    }
 
-  public void add(final Rule rule) {
-    rules.add(rule);
-  }
+    fun add(rule: Rule) {
+        rules.add(rule)
+    }
 
-  public String getName() {
-    return name;
-  }
+    fun getRules(): List<Rule> {
+        return rules
+    }
 
-  public List<Rule> getRules() {
-    return rules;
-  }
+    init {
+        rules = ArrayList()
+    }
 }

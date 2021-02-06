@@ -1,25 +1,26 @@
-package com.adamkoch.iptables.objects;
+package com.adamkoch.iptables.objects
 
-import java.util.Objects;
+import com.adamkoch.iptables.objects.MacAddress
+import java.util.Objects
 
 /**
  *
  * @since 0.1.0
  * @author aakoch
  */
-public class MacAddress {
+class MacAddress(addr: String) {
+    private val addr: String
+    override fun toString(): String {
+        return addr
+    }
 
-  public static final MacAddress DUMMY = new MacAddress("00:00:00:a1:2b:cc");
+    companion object {
+        @JvmField
+        val DUMMY = MacAddress("00:00:00:a1:2b:cc")
+    }
 
-  private final String addr;
-
-  public MacAddress(final String addr) {
-    Objects.requireNonNull(addr);
-    this.addr = addr;
-  }
-
-  @Override
-  public String toString() {
-    return addr;
-  }
+    init {
+        Objects.requireNonNull(addr)
+        this.addr = addr
+    }
 }

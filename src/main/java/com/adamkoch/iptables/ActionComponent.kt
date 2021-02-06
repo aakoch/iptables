@@ -1,4 +1,7 @@
-package com.adamkoch.iptables;
+package com.adamkoch.iptables
+
+import com.adamkoch.iptables.ActionComponent
+import kotlin.jvm.JvmOverloads
 
 /**
  * Represents the actions a rule can take.
@@ -6,48 +9,41 @@ package com.adamkoch.iptables;
  * @since 0.1.0
  * @author aakoch
  */
-public class ActionComponent {
+open class ActionComponent {
+    /**
+     * Drop the packet
+     */
+    class DropActionComponent : ActionComponent() {
+        override fun toString(): String {
+            return "-j DROP"
+        }
+    }
 
-  /**
-   * Drop the packet
-   */
-  public static final class DropActionComponent extends ActionComponent {
-    public String toString () {
-      return "-j DROP";
+    /**
+     * Reject the packet
+     */
+    class RejectActionComponent @JvmOverloads constructor(private val rejectWithTcpReset: Boolean = true) :
+        ActionComponent() {
+        override fun toString(): String {
+            return "-j REJECT" + if (rejectWithTcpReset) " --reject-with tcp-reset" else ""
+        }
     }
-  }
 
-  /**
-   * Reject the packet
-   */
-  public static final class RejectActionComponent extends ActionComponent {
-    private final boolean rejectWithTcpReset;
-    public RejectActionComponent() {
-      this(true);
+    /**
+     * Return from chain
+     */
+    class ReturnActionComponent : ActionComponent() {
+        override fun toString(): String {
+            return "-j RETURN"
+        }
     }
-    public RejectActionComponent(boolean rejectWithTcpReset) {
-      this.rejectWithTcpReset = rejectWithTcpReset;
-    }
-    public String toString () {
-      return "-j REJECT" + (rejectWithTcpReset ? " --reject-with tcp-reset" : "");
-    }
-  }
 
-  /**
-   * Return from chain
-   */
-  public static final class ReturnActionComponent extends ActionComponent {
-    public String toString () {
-      return "-j RETURN";
+    /**
+     * Accept rule
+     */
+    class AcceptActionComponent : ActionComponent() {
+        override fun toString(): String {
+            return "-j ACCEPT"
+        }
     }
-  }
-
-  /**
-   * Accept rule
-   */
-  public static final class AcceptActionComponent extends ActionComponent {
-    public String toString () {
-      return "-j ACCEPT";
-    }
-  }
 }

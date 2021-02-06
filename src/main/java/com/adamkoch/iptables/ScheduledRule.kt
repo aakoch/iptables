@@ -1,7 +1,7 @@
-package com.adamkoch.iptables;
+package com.adamkoch.iptables
 
-import com.adamkoch.annotations.Unstable;
-import com.adamkoch.iptables.matches.Match;
+import com.adamkoch.annotations.Unstable
+import com.adamkoch.iptables.matches.Match
 
 /**
  *
@@ -9,16 +9,10 @@ import com.adamkoch.iptables.matches.Match;
  * @author aakoch
  */
 @Unstable
-public class ScheduledRule extends Rule {
-
-  public ScheduledRule(final Match match, final ActionComponent actionComponent) {
-    super(actionComponent);
-  }
-//
+class ScheduledRule(match: Match?, actionComponent: ActionComponent?) //
 //  public ScheduledRule(final String chain, final RuleSpecification ruleSpec, final Options options) {
 //    super(chain, ruleSpec, options);
 //  }
-
 //  private final Schedule schedule;
 //
 //  public ScheduledRule(final Rule rule, final Schedule schedule) {
@@ -98,4 +92,4 @@ public class ScheduledRule extends Rule {
 //
 //    return timeRangeToDayMaps;
 //  }
-}
+    : Rule(actionComponent!!)

@@ -1,9 +1,8 @@
-package com.adamkoch.iptables;
+package com.adamkoch.iptables
 
-import com.adamkoch.annotations.Unstable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringJoiner;
+import com.adamkoch.annotations.Unstable
+import java.util.*
+import java.util.function.Consumer
 
 /**
  *
@@ -11,28 +10,23 @@ import java.util.StringJoiner;
  * @author aakoch
  */
 @Unstable
-public class Schedule {
+class Schedule {
+    private val daySchedules: MutableList<DaySchedule>
+    fun add(daySchedule: DaySchedule) {
+        daySchedules.add(daySchedule)
+    }
 
-  private final List<DaySchedule> daySchedules;
+    fun getDaySchedules(): List<DaySchedule> {
+        return daySchedules
+    }
 
-  public Schedule() {
-    daySchedules = new ArrayList<>();
-  }
+    override fun toString(): String {
+        val sj = StringJoiner(", ")
+        daySchedules.forEach(Consumer { daySchedule: DaySchedule -> sj.add(daySchedule.toString()) })
+        return sj.toString()
+    }
 
-  public void add(final DaySchedule daySchedule) {
-    daySchedules.add(daySchedule);
-  }
-
-  public List<DaySchedule> getDaySchedules() {
-    return daySchedules;
-  }
-
-  @Override
-  public String toString() {
-    StringJoiner sj = new StringJoiner(", ");
-    daySchedules.forEach(daySchedule -> {
-      sj.add(daySchedule.toString());
-    });
-    return sj.toString();
-  }
+    init {
+        daySchedules = ArrayList()
+    }
 }

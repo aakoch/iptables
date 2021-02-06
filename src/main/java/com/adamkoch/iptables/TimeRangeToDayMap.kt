@@ -1,11 +1,7 @@
-package com.adamkoch.iptables;
+package com.adamkoch.iptables
 
-import com.adamkoch.annotations.Unstable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import com.adamkoch.annotations.Unstable
+import java.util.*
 
 /**
  *
@@ -13,72 +9,58 @@ import java.util.Set;
  * @author aakoch
  */
 @Unstable
-public class TimeRangeToDayMap {
-
-  private final TimeRange timeRange;
-  private final Set<String> days;
-
-  public TimeRangeToDayMap(final TimeRange timeRange) {
-    this.timeRange = timeRange;
-    days = new HashSet<>();
-  }
-
-  public void addDay(final String day) {
-    days.add(day);
-  }
-
-  List<String> getDays() {
-    List<String> dayList = new ArrayList<>();
-    if (days.contains("Mon")) {
-      dayList.add("Mon");
-    }
-    if (days.contains("Tue")) {
-      dayList.add("Tue");
-    }
-    if (days.contains("Wed")) {
-      dayList.add("Wed");
-    }
-    if (days.contains("Thu")) {
-      dayList.add("Thu");
-    }
-    if (days.contains("Fri")) {
-      dayList.add("Fri");
+class TimeRangeToDayMap(val timeRange: TimeRange) {
+    private val days: MutableSet<String>
+    fun addDay(day: String) {
+        days.add(day)
     }
 
-    return dayList;
-  }
-
-  public TimeRange getTimeRange() {
-    return timeRange;
-  }
-
-  public String getDaysString() {
-    return String.join(",", getDays());
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
+    fun getDays(): List<String> {
+        val dayList: MutableList<String> = ArrayList()
+        if (days.contains("Mon")) {
+            dayList.add("Mon")
+        }
+        if (days.contains("Tue")) {
+            dayList.add("Tue")
+        }
+        if (days.contains("Wed")) {
+            dayList.add("Wed")
+        }
+        if (days.contains("Thu")) {
+            dayList.add("Thu")
+        }
+        if (days.contains("Fri")) {
+            dayList.add("Fri")
+        }
+        return dayList
     }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+
+    val daysString: String
+        get() = java.lang.String.join(",", getDays())
+
+    override fun equals(o: Any?): Boolean {
+        if (this === o) {
+            return true
+        }
+        if (o == null || javaClass != o.javaClass) {
+            return false
+        }
+        val that = o as TimeRangeToDayMap
+        return timeRange == that.timeRange && days == that.days
     }
-    final TimeRangeToDayMap that = (TimeRangeToDayMap) o;
-    return timeRange.equals(that.timeRange) &&
-        days.equals(that.days);
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(timeRange, days);
-  }
+    override fun hashCode(): Int {
+        return Objects.hash(timeRange, days)
+    }
 
-  @Override
-  public String toString() {
-    return "TimeRangeMap{" +
-        "timeRange=" + timeRange +
-        ", days=" + getDaysString() +
-        '}';
-  }
+    override fun toString(): String {
+        return "TimeRangeMap{" +
+                "timeRange=" + timeRange +
+                ", days=" + daysString +
+                '}'
+    }
+
+    init {
+        days = HashSet()
+    }
 }
