@@ -16,7 +16,7 @@ open class ExtensionMatch(type: String) : Match {
     val type: String
     private var options: MutableList<ExtensionMatchOption>
     protected var extensionMatchOptions: List<ExtensionMatchOption>?
-        protected get() = Collections.unmodifiableList(options)
+        get() = Collections.unmodifiableList(options)
         protected set(extensionMatchOptions) {
             options = ArrayList(extensionMatchOptions)
         }
@@ -26,7 +26,7 @@ open class ExtensionMatch(type: String) : Match {
     }
 
     override fun asString(): String {
-        val optionsStringBuilder = StringBuilder(options.size shl 4)
+        val optionsStringBuilder = StringBuilder(options.size * 16)
         if (!options.isEmpty()) {
             for (option in options) {
                 optionsStringBuilder.append(" ")

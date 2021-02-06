@@ -1,14 +1,16 @@
-package com.adamkoch.iptables.matches;
+package com.adamkoch.iptables.matches
+
+import com.adamkoch.iptables.matches.GenericMatch
 
 /**
- * The following description is from <a href="https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html">https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html</a>.
- * <br> Copied here for posterity. Please use the above webpage as official documentation.
+ * The following description is from [https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html](https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html).
+ * <br></br> Copied here for posterity. Please use the above webpage as official documentation.
  *
  * <dl>
- *    <dt>Match</dt><dd>-s, --src, --source</dd>
- *    <dt>Kernel</dt><dd>2.3, 2.4, 2.5 and 2.6</dd>
- *    <dt>Example</dt><dd>iptables -A INPUT -s 192.168.1.1</dd>
- *    <dt>Explanation</dt><dd>
+ * <dt>Match</dt><dd>-s, --src, --source</dd>
+ * <dt>Kernel</dt><dd>2.3, 2.4, 2.5 and 2.6</dd>
+ * <dt>Example</dt><dd>iptables -A INPUT -s 192.168.1.1</dd>
+ * <dt>Explanation</dt><dd>
  * This is
  * the source match, which is used to match packets, based on their source IP address. The main form can be used to
  * match single IP addresses, such as 192.168.1.1. It could also be used with a netmask in a CIDR "bit" form, by
@@ -19,14 +21,9 @@ package com.adamkoch.iptables.matches;
  * 192.168.0.0/255.255.255.0). We could also invert the match with an ! just as before. If we were, in other words, to
  * use a match in the form of --source ! 192.168.0.0/24, we would match all packets with a source address not coming
  * from within the 192.168.0.x range. The default is to match all IP addresses.</dd>
- * </dl>
+</dl> *
  *
  * @author aakoch
  * @since 0.1.0
  */
-public class SourceMatch extends GenericMatch {
-
-  public SourceMatch(final String value) {
-    super(new String[]{"-s", "--src", "--source"}, value);
-  }
-}
+class SourceMatch(value: String) : GenericMatch(arrayOf("-s", "--src", "--source"), value)

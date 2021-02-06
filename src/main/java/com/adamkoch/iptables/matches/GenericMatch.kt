@@ -1,7 +1,6 @@
-package com.adamkoch.iptables.matches;
+package com.adamkoch.iptables.matches
 
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.Objects
 
 /**
  * Name came from https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#GENERICMATCHES
@@ -20,34 +19,30 @@ import java.util.Objects;
  * @author aakoch
  * @since 0.1.0
  */
-public class GenericMatch implements Match {
+open class GenericMatch : Match {
+    //  public static final GenericMatch EXPLICIT_MATCH = new GenericMatch("-m");
+    private val flags: Array<String>
+    private val value: String
 
-//  public static final GenericMatch EXPLICIT_MATCH = new GenericMatch("-m");
+    constructor(flag: String, value: String) {
+        Objects.requireNonNull(flag)
+        Objects.requireNonNull(value)
+        flags = arrayOf(flag)
+        this.value = value
+    }
 
-  private final String[] flags;
-  private final String value;
+    protected constructor(flags: Array<String>, value: String) {
+        Objects.requireNonNull(flags)
+        Objects.requireNonNull(value)
+        this.flags = flags
+        this.value = value
+    }
 
-  public GenericMatch(final String flag, final String value) {
-    Objects.requireNonNull(flag);
-    Objects.requireNonNull(value);
-    this.flags = new String[]{flag};
-    this.value = value;
-  }
+    override fun asString(): String {
+        return flags[0] + " " + value
+    }
 
-  protected GenericMatch(final String[] flags, final String value) {
-    Objects.requireNonNull(flags);
-    Objects.requireNonNull(value);
-    this.flags = flags;
-    this.value = value;
-  }
-
-  @Override
-  public String asString() {
-    return flags[0] + " " + value;
-  }
-
-  @Override
-  public String toString() {
-    return asString();
-  }
+    override fun toString(): String {
+        return asString()
+    }
 }

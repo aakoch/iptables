@@ -1,6 +1,7 @@
-package com.adamkoch.iptables.matches;
+package com.adamkoch.iptables.matches
 
-import com.adamkoch.iptables.objects.MacAddress;
+import com.adamkoch.iptables.objects.MacAddress
+import com.adamkoch.iptables.matches.MacAddressMatch
 
 /**
  * Match for MAC addresses.
@@ -8,23 +9,15 @@ import com.adamkoch.iptables.objects.MacAddress;
  * @author aakoch
  * @since 0.1.0
  */
-public class MacAddressMatch implements Match {
+class MacAddressMatch(private val macAddress: MacAddress) : Match {
+    private var inverseFlag = false
+    operator fun not(): Match {
+        val newMatchingComponent = MacAddressMatch(macAddress)
+        newMatchingComponent.inverseFlag = true
+        return newMatchingComponent
+    }
 
-  private final MacAddress macAddress;
-  private boolean inverseFlag;
-
-  public MacAddressMatch(final MacAddress macAddress) {
-    this.macAddress = macAddress;
-  }
-
-  public Match not() {
-    final MacAddressMatch newMatchingComponent = new MacAddressMatch(macAddress);
-    newMatchingComponent.inverseFlag = true;
-    return newMatchingComponent;
-  }
-
-  @Override
-  public String asString() {
-    return "-m mac " + (inverseFlag ? "! " : "") + "--mac-source " + macAddress;
-  }
+    override fun asString(): String {
+        return "-m mac " + (if (inverseFlag) "! " else "") + "--mac-source " + macAddress
+    }
 }
