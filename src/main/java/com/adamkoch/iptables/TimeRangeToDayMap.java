@@ -1,9 +1,18 @@
+package com.adamkoch.iptables;
+
+import com.adamkoch.annotations.Unstable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ *
+ * @since 0.1.0
+ * @author aakoch
+ */
+@Unstable
 public class TimeRangeToDayMap {
 
   private final TimeRange timeRange;

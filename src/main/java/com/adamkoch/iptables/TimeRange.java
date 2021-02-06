@@ -1,6 +1,15 @@
+package com.adamkoch.iptables;
+
+import com.adamkoch.annotations.Unstable;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ *
+ * @since 0.1.0
+ * @author aakoch
+ */
+@Unstable
 public class TimeRange {
 
   public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm");

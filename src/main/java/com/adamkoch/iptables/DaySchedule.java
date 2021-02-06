@@ -1,6 +1,13 @@
+package com.adamkoch.iptables;
+
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @since 0.1.0
+ * @author aakoch
+ */
 public class DaySchedule {
 
   private final String day;
