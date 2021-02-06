@@ -1,4 +1,8 @@
-package com.adamkoch.iptables.matches;
+package com.adamkoch.iptables.matches
+
+import com.adamkoch.iptables.matches.GenericMatch
+import java.lang.IllegalArgumentException
+import com.adamkoch.iptables.matches.DestinationPortMatch
 
 /**
  * Matches against a destination port.
@@ -6,19 +10,16 @@ package com.adamkoch.iptables.matches;
  * @author aakoch
  * @since 0.1.0
  */
-public class DestinationPortMatch extends GenericMatch {
+class DestinationPortMatch(value: Int) : GenericMatch("--dport", Integer.toString(value)) {
+    constructor(value: String) : this(value.toInt()) {}
 
-  public DestinationPortMatch(final String value) {
-    this(Integer.parseInt(value));
-  }
+    companion object {
+        private fun requireWithinPortRange(value: Int) {
+            require(!(value < 0 || value > 65535)) { "port \"$value\" is outside the allowed port range of 0 - 65535" }
+        }
+    }
 
-  public DestinationPortMatch(final int value) {
-    super("--dport", Integer.toString(value));
-    requireWithinPortRange(value);
-  }
-
-  private static void requireWithinPortRange(final int value) {
-    if (value < 0 || value > 65535)
-      throw new IllegalArgumentException("port \"" + value + "\" is outside the allowed port range of 0 - 65535");
-  }
+    init {
+        requireWithinPortRange(value)
+    }
 }

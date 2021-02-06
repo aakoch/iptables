@@ -42,7 +42,7 @@ class MainTest {
 
   private Rule createRule(final ActionComponent actionComponent, final Match match) {
     Rule rule = new Rule(actionComponent);
-    rule.addMatchingComponents(match);
+    rule.addMatch(match);
     return rule;
   }
   

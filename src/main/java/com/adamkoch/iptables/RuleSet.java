@@ -34,18 +34,18 @@ public class RuleSet {
     final MacAddressMatch macAddressMatchingComponent = new MacAddressMatch(macAddress);
 
     Rule rule1 = new Rule(new ActionComponent.RejectActionComponent());
-    rule1.addMatchingComponents(keywordMatchingComponent1);
+    rule1.addMatch(keywordMatchingComponent1);
     rules.add(rule1);
 
     Rule rule2 = new Rule(new ActionComponent.RejectActionComponent());
-    rule2.addMatchingComponents(keywordMatch2);
+    rule2.addMatch(keywordMatch2);
     rules.add(rule2);
 
     Rule rule3 = new Rule(new ActionComponent.RejectActionComponent());
-    rule3.addMatchingComponents(keywordMatch3);
+    rule3.addMatch(keywordMatch3);
     rules.add(rule3);
 
-    rules.forEach(rule -> rule.addMatchingComponents(macAddressMatchingComponent));
+    rules.forEach(rule -> rule.addMatch(macAddressMatchingComponent));
 
   }
 

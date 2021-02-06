@@ -55,25 +55,25 @@ class ChainTest {
   private Rule getWebstrRule() {
     Rule rule = new Rule(new RejectActionComponent());
     Match match = new WebStringExtensionMatch("keyword");
-    rule.addMatchingComponents(match);
+    rule.addMatch(match);
     return rule;
   }
 
   private Rule getMacAddrRule() {
     Rule rule = new Rule(new DropActionComponent());
-    rule.addMatchingComponents(new MacAddressMatch(MacAddress.DUMMY));
+    rule.addMatch(new MacAddressMatch(MacAddress.DUMMY));
     return rule;
   }
 
   private Rule getAllowMacAddrRule() {
     Rule rule = new Rule(new AcceptActionComponent());
-    rule.addMatchingComponents(new MacAddressMatch(MacAddress.DUMMY));
+    rule.addMatch(new MacAddressMatch(MacAddress.DUMMY));
     return rule;
   }
 
   private Rule getReturnWhenNotMacAddrRule() {
     Rule rule = new Rule(new ReturnActionComponent());
-    rule.addMatchingComponents(new MacAddressMatch(MacAddress.DUMMY).not());
+    rule.addMatch(new MacAddressMatch(MacAddress.DUMMY).not());
     return rule;
   }
 }
