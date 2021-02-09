@@ -3,3 +3,4 @@ secrets.properties
 iptables.iml
 target/
 out/
+src/main/scripts/
