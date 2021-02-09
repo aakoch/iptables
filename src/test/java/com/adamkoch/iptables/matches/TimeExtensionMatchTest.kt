@@ -1,5 +1,6 @@
 package com.adamkoch.iptables.matches
 
+import com.adamkoch.iptables.DayOfWeekSchedule
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.time.*
@@ -91,14 +92,14 @@ internal class TimeExtensionMatchTest {
     @Test
     fun withWeekDays() {
         val match = TimeExtensionMatch()
-        match.days = WEEKDAYS
+        match.days = DayOfWeekSchedule.WEEKDAYS
         Assertions.assertEquals("-m time --weekdays Mon,Tue,Wed,Thu,Fri", match.asString())
     }
 
     @Test
     fun withWeekends() {
         val match = TimeExtensionMatch()
-        match.days = WEEKENDS
+        match.days = DayOfWeekSchedule.WEEKENDS
         Assertions.assertEquals("-m time --weekdays Sat,Sun", match.asString())
     }
 
@@ -109,17 +110,6 @@ internal class TimeExtensionMatchTest {
         Assertions.assertEquals(
             "-m time --datestart 1970-01-01T00:00:00 --kerneltz",
             match.asString()
-        )
-    }
-
-    companion object {
-        private val WEEKENDS = arrayOf<DayOfWeek?>(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
-        private val WEEKDAYS = arrayOf<DayOfWeek?>(
-            DayOfWeek.MONDAY,
-            DayOfWeek.TUESDAY,
-            DayOfWeek.WEDNESDAY,
-            DayOfWeek.THURSDAY,
-            DayOfWeek.FRIDAY
         )
     }
 }

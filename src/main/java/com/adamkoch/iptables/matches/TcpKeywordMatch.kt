@@ -9,4 +9,6 @@ import java.util.List
  * @since 0.1.0
  */
 class TcpKeywordMatch(keyword: String) :
-    AggregatedMatch(List.of(ProtocolMatch.TCP, WebStringExtensionMatch(keyword)))
+    AggregatedMatch(List.of(ProtocolMatch.TCP, WebStringExtensionMatch(keyword))) {
+    override val rank: Int = 5
+}

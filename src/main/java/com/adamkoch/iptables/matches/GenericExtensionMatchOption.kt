@@ -13,7 +13,7 @@ import java.util.HashSet
  * @since 0.1.0
  */
 @Unstable
-open class GenericExtensionMatchOption @JvmOverloads constructor(
+open class GenericExtensionMatchOption constructor(
     flags: MutableList<String>
 ) : ExtensionMatchOption {
     // I might remove this

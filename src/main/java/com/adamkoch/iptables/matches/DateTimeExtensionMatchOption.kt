@@ -6,15 +6,20 @@ import java.time.temporal.Temporal
 import java.util.*
 
 abstract class DateTimeExtensionMatchOption protected constructor(protected val temporal: Temporal) :
+
+/**
+ *
+ */
     GenericExtensionMatchOption(Arrays.asList("--date", "--time")) {
+
+
     private var useKernelTZ = true
     fun setUseKernelTZ(newValue: Boolean) {
         useKernelTZ = newValue
     }
 
     protected fun asString(startOrStop: Boolean): String {
-        val type: String
-        type = if (temporal.isSupported(ChronoField.YEAR) || temporal is Instant) {
+        val type = if (temporal.isSupported(ChronoField.YEAR) || temporal is Instant) {
             "date"
         } else {
             "time"

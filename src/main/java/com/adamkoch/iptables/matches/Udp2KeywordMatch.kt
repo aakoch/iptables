@@ -11,6 +11,7 @@ import java.util.*
  */
 @Unstable
 class Udp2KeywordMatch(keyword: String, ipAddress: String) : Match {
+    override val rank: Int = 2
     private val keyword: String
     private val ipAddress: String
     override fun asString(): String {

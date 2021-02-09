@@ -11,22 +11,23 @@ import java.util.function.Consumer
  */
 @Unstable
 class Schedule {
-    private val daySchedules: MutableList<DaySchedule>
-    fun add(daySchedule: DaySchedule) {
-        daySchedules.add(daySchedule)
+    private val dayOfWeekSchedules: MutableList<DayOfWeekSchedule>
+    fun add(dayOfWeekSchedule: DayOfWeekSchedule) {
+        dayOfWeekSchedules.add(dayOfWeekSchedule)
     }
 
-    fun getDaySchedules(): List<DaySchedule> {
-        return daySchedules
+    fun getDaySchedules(): List<DayOfWeekSchedule> {
+        return dayOfWeekSchedules
     }
 
     override fun toString(): String {
+//        return daySchedules.joinToString()
         val sj = StringJoiner(", ")
-        daySchedules.forEach(Consumer { daySchedule: DaySchedule -> sj.add(daySchedule.toString()) })
+        dayOfWeekSchedules.forEach(Consumer { dayOfWeekSchedule: DayOfWeekSchedule -> sj.add(dayOfWeekSchedule.toString()) })
         return sj.toString()
     }
 
     init {
-        daySchedules = ArrayList()
+        dayOfWeekSchedules = ArrayList()
     }
 }

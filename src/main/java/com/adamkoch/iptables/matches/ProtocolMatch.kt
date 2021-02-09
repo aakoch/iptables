@@ -25,6 +25,7 @@ import java.util.*
  * @since 0.1.0
  */
 class ProtocolMatch private constructor(private val protocol: Protocol) : Match {
+    override val rank: Int = 1
 
     override fun asString(): String {
         return "-p ${protocol.name.toLowerCase(Locale.ENGLISH)}"

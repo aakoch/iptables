@@ -4,13 +4,20 @@ import com.adamkoch.iptables.objects.MacAddress
 import com.adamkoch.iptables.matches.MacAddressMatch
 
 /**
- * Match for MAC addresses.
+ * Mac address match
  *
- * @author aakoch
- * @since 0.1.0
+ * @property macAddress
+ * @constructor Create empty Mac address match
  */
 class MacAddressMatch(private val macAddress: MacAddress) : Match {
+    override val rank: Int = 0
     private var inverseFlag = false
+
+    /**
+     * Not
+     *
+     * @return
+     */
     operator fun not(): Match {
         val newMatchingComponent = MacAddressMatch(macAddress)
         newMatchingComponent.inverseFlag = true

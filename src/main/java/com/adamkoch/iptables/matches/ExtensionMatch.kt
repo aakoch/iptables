@@ -13,6 +13,7 @@ import java.util.Objects
  * @since 0.1.0
  */
 open class ExtensionMatch(type: String) : Match {
+    override val rank: Int = 0
     val type: String
     private var options: MutableList<ExtensionMatchOption>
     protected var extensionMatchOptions: List<ExtensionMatchOption>?

@@ -2,14 +2,78 @@ package com.adamkoch.iptables
 
 import com.adamkoch.iptables.ActionComponent.*
 import com.adamkoch.iptables.Util.sanitize
-import com.adamkoch.iptables.matches.MacAddressMatch
-import com.adamkoch.iptables.matches.Match
-import com.adamkoch.iptables.matches.WebStringExtensionMatch
+import com.adamkoch.iptables.matches.*
 import com.adamkoch.iptables.objects.MacAddress
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import java.io.FileReader
+import java.time.LocalTime
+import java.util.*
+import kotlin.test.assertEquals
 
 internal class ChainTest {
+
+    @Test
+    fun morningSchoolTime() {
+        val properties = Properties()
+        properties.load(FileReader("secrets.properties"))
+
+        val chainBuilder = ChainBuilder("Joel's Omen")
+            .returnIf(MacAddress(properties.getProperty("joel.omen.mac")))
+            .ifBetween(8, 0, 11, 0)
+            .ifContains("discord")
+            .reject()
+            .ifBetween(12, 0, 15, 0)
+            .ifContains("discord")
+            .reject()
+
+        val omenChain = Chain("Joel's Omen")
+        val shortCircuitMacAddress = MacAddress(properties.getProperty("joel.omen.mac"))
+        val shortCircuitMacAddressMatch = MacAddressMatch(shortCircuitMacAddress);
+        val shortCircuitMacAddressRule = Rule(ActionComponent.ReturnActionComponent())
+        shortCircuitMacAddressRule.addMatch(shortCircuitMacAddressMatch)
+
+        omenChain.add(shortCircuitMacAddressRule)
+
+        val schoolMornings = TimeSchedule()
+
+        val schoolStartTime = LocalTime.of(8, 0)
+        val lunchStartTime = LocalTime.of(11, 0)
+
+        schoolMornings.add(TimeRange(schoolStartTime, lunchStartTime))
+        val schoolMorningsMatch = TimeExtensionMatch()
+        schoolMorningsMatch.setStart(schoolStartTime)
+        schoolMorningsMatch.setEnd(lunchStartTime)
+
+        val schoolAfternoonsMatch = TimeExtensionMatch()
+
+        val lunchEndTime = LocalTime.of(12, 0)
+        val schoolEndTime = LocalTime.of(15, 0)
+
+        schoolAfternoonsMatch.setStart(lunchEndTime)
+        schoolAfternoonsMatch.setEnd(schoolEndTime)
+
+        val discordTcpKeywordMatch = TcpKeywordMatch("discord")
+
+        val preventDiscordMorningsRule = Rule(ActionComponent.RejectActionComponent())
+        preventDiscordMorningsRule.addMatch(discordTcpKeywordMatch, schoolMorningsMatch)
+        omenChain.add(preventDiscordMorningsRule)
+
+        val preventDiscordAfternoonsRule = Rule(ActionComponent.RejectActionComponent())
+        preventDiscordAfternoonsRule.addMatch(discordTcpKeywordMatch, schoolAfternoonsMatch)
+        omenChain.add(preventDiscordAfternoonsRule)
+
+        System.out.println(omenChain.toString())
+        System.out.println(chainBuilder.toString())
+
+        assertEquals(omenChain.toString(), chainBuilder.toString())
+
+        val writer = ScriptWriter()
+        writer.add(omenChain)
+        println(writer.toString())
+    }
+
+
     @Test
     fun basic() {
         val chain = Chain(INVALID_CHAIN_NAME)

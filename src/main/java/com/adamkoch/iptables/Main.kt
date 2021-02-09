@@ -6,6 +6,7 @@ import com.adamkoch.iptables.objects.MacAddress
 import com.adamkoch.iptables.ActionComponent.ReturnActionComponent
 import com.adamkoch.iptables.ActionComponent.RejectActionComponent
 import com.adamkoch.iptables.ActionComponent.DropActionComponent
+import com.adamkoch.iptables.DayOfWeekSchedule.Companion.WEEKDAYS
 import java.time.LocalTime
 import java.io.FileWriter
 import java.io.IOException
@@ -13,6 +14,7 @@ import com.adamkoch.iptables.matches.*
 import kotlin.Throws
 import kotlin.jvm.JvmStatic
 import java.io.FileReader
+import java.time.DayOfWeek
 import java.util.ArrayList
 
 /* Do we need?
@@ -71,6 +73,8 @@ class Main(
     private val tv1: Device
     private val tv2: Device
     private fun run() {
+
+
         val chains: MutableList<Chain> = ArrayList()
         val joelsDevices = createJoelsDevices()
         val joelsVirtualSchedule = setUpJoelSchedule()
@@ -223,29 +227,11 @@ class Main(
         val lunchStart = LocalTime.of(11, 0)
         val lunchEnd = LocalTime.of(12, 0)
         val endOfSchool = LocalTime.of(15, 45)
-        val morningVirtual = TimeRange(startOfSchool, lunchStart)
-        val afternoonVirtual = TimeRange(lunchEnd, endOfSchool)
-        val mondaySchedule = DaySchedule("Mon")
-        mondaySchedule.add(morningVirtual)
-        mondaySchedule.add(afternoonVirtual)
-        val tuesdaySchedule = DaySchedule("Tue")
-        tuesdaySchedule.add(morningVirtual)
-        tuesdaySchedule.add(afternoonVirtual)
-        val wednesdaySchedule = DaySchedule("Wed")
-        wednesdaySchedule.add(morningVirtual)
-        wednesdaySchedule.add(afternoonVirtual)
-        val thursdaySchedule = DaySchedule("Thu")
-        thursdaySchedule.add(morningVirtual)
-        thursdaySchedule.add(afternoonVirtual)
-        val fridaySchedule = DaySchedule("Fri")
-        fridaySchedule.add(morningVirtual)
-        fridaySchedule.add(afternoonVirtual)
+        val morningSchedule = DayOfWeekSchedule(WEEKDAYS.toSet() as Set<DayOfWeek>, TimeRange(startOfSchool, lunchStart))
+        val afternoonSchedule = DayOfWeekSchedule(WEEKDAYS.toSet() as Set<DayOfWeek>, TimeRange(lunchEnd, endOfSchool))
         val schedule = Schedule()
-        schedule.add(mondaySchedule)
-        schedule.add(tuesdaySchedule)
-        schedule.add(wednesdaySchedule)
-        schedule.add(thursdaySchedule)
-        schedule.add(fridaySchedule)
+        schedule.add(morningSchedule)
+        schedule.add(afternoonSchedule)
         return schedule
     }
 
@@ -285,29 +271,11 @@ class Main(
         val lunchStart = LocalTime.of(11, 0)
         val lunchEnd = LocalTime.of(12, 0)
         val endOfSchool = LocalTime.of(15, 0)
-        val morningVirtual = TimeRange(startOfSchool, lunchStart)
-        val afternoonVirtual = TimeRange(lunchEnd, endOfSchool)
-        val mondaySchedule = DaySchedule("Mon")
-        mondaySchedule.add(morningVirtual)
-        mondaySchedule.add(afternoonVirtual)
-        val tuesdaySchedule = DaySchedule("Tue")
-        tuesdaySchedule.add(morningVirtual)
-        tuesdaySchedule.add(afternoonVirtual)
-        val wednesdaySchedule = DaySchedule("Wed")
-        wednesdaySchedule.add(morningVirtual)
-        wednesdaySchedule.add(afternoonVirtual)
-        val thursdaySchedule = DaySchedule("Thu")
-        thursdaySchedule.add(morningVirtual)
-        thursdaySchedule.add(afternoonVirtual)
-        val fridaySchedule = DaySchedule("Fri")
-        fridaySchedule.add(morningVirtual)
-        fridaySchedule.add(afternoonVirtual)
+        val morningSchedule = DayOfWeekSchedule(WEEKDAYS.toSet() as Set<DayOfWeek>, TimeRange(startOfSchool, lunchStart))
+        val afternoonSchedule = DayOfWeekSchedule(WEEKDAYS.toSet() as Set<DayOfWeek>, TimeRange(lunchEnd, endOfSchool))
         val schedule = Schedule()
-        schedule.add(mondaySchedule)
-        schedule.add(tuesdaySchedule)
-        schedule.add(wednesdaySchedule)
-        schedule.add(thursdaySchedule)
-        schedule.add(fridaySchedule)
+        schedule.add(morningSchedule)
+        schedule.add(afternoonSchedule)
         return schedule
     }
 

@@ -23,4 +23,5 @@ import com.adamkoch.iptables.matches.GenericMatch
  * @since 0.1.0
  */
 class DestinationMatch(value: String) :
-    GenericMatch(arrayOf("-d", "--dst", "--destination"), value)
+    GenericMatch(arrayOf("-d", "--dst", "--destination"), value) {
+}

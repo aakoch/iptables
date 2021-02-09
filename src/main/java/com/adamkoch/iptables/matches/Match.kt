@@ -6,7 +6,9 @@ package com.adamkoch.iptables.matches
  * @author aakoch
  * @since 0.1.0
  */
-fun interface Match {
+interface Match {
+    abstract val rank: Int
+
     /**
      * Returns a string representation. I wanted to leave "toString()" as a method for outputting matches for developers
      * while debugging or logging.

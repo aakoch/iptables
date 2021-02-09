@@ -14,8 +14,8 @@ import java.util.Arrays
  * @author aakoch
  */
 @Unstable
-open class Rule(private val actionComponent: ActionComponent) {
-    private val matches: MutableList<Match>
+open class Rule(val actionComponent: ActionComponent) {
+    val matches: MutableList<Match>
 
     fun comment(): String? {
         return null
@@ -48,9 +48,12 @@ open class Rule(private val actionComponent: ActionComponent) {
     //        "iptables -I INPUT -d 192.168.0.1/32 -i br0 -p udp -m mac --mac-source %s -m udp --dport 53 -m string --string \"%s\" --algo bm --to 65535 --icase -j DROP",
     //        device.getMacAddress(), keyword);
     //  }
-    fun asString(): String {
-        return matches.stream().map { obj: Match -> obj.asString() }
-            .collect(Collectors.joining(" ")) + " " + actionComponent.toString()
+    open fun asString(): String {
+
+        val comparator = Comparator { match1: Match, match2: Match -> match2.rank - match1.rank }
+
+
+        return matches.sortedWith(comparator).joinToString (" ", transform = Match::asString ) + " " + actionComponent.toString()
     }
 
     fun addMatch(vararg matches: Match) {

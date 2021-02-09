@@ -14,6 +14,8 @@ class Udp1KeywordMatch
 /**
  * @param keyword Keyword that will be used to REJECT packets
  */(private val keyword: String) : Match {
+    override val rank: Int = 2
+
     override fun asString(): String {
 //    [!] --in-interface -i input name[+]
 //        network interface name ([+] for wildcard)

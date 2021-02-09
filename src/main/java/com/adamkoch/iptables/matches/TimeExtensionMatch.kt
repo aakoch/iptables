@@ -83,6 +83,7 @@ import java.util.*
  * @author aakoch
  * @since 0.1.0
  */
+// TODO: this needs work/more thought. Are we allowing for open-ended matches? We should. Instead of having separate start and end just have options? Hmm...
 class TimeExtensionMatch : ExtensionMatch("time") {
     var start: Optional<DateTimeExtensionMatchOption>
         private set
@@ -95,10 +96,12 @@ class TimeExtensionMatch : ExtensionMatch("time") {
     }
 
     fun setEnd(endTemporal: Temporal) {
+        end.ifPresent { throw IllegalStateException("end time is already set") }
         end = Optional.of(EndDateTimeExtensionMatchOption(endTemporal))
     }
 
     fun setStart(startTemporal: Temporal) {
+        start.ifPresent { throw IllegalStateException("start time is already set") }
         start = Optional.of(StartDateTimeExtensionMatchOption(startTemporal))
     }
 

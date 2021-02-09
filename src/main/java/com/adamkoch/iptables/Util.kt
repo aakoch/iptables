@@ -17,6 +17,6 @@ object Util {
      */
     @JvmStatic
     fun sanitize(value: String): String {
-        return value.replace("[-'\"_():]".toRegex(), "").replace(" ".toRegex(), "_")
+        return value.replace("[-'\"():]".toRegex(), "").replace(" ".toRegex(), "_")
     }
 }
