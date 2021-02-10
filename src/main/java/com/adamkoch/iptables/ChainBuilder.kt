@@ -2,6 +2,7 @@ package com.adamkoch.iptables
 
 import com.adamkoch.iptables.matches.*
 import com.adamkoch.iptables.objects.MacAddress
+import com.adamkoch.iptables.objects.Protocol
 import java.time.LocalTime
 
 class ChainBuilder(val name: String) {
@@ -10,7 +11,16 @@ class ChainBuilder(val name: String) {
 
     fun returnIf(macAddress: MacAddress) : ChainBuilder {
         val shortCircuitMacAddressMatch = MacAddressMatch(macAddress);
-        val rule = Rule(ActionComponent.ReturnActionComponent())
+        return returnIfInternal(shortCircuitMacAddressMatch)
+    }
+
+    fun returnIfNot(macAddress: MacAddress) : ChainBuilder {
+        val shortCircuitMacAddressMatch = MacAddressMatch(macAddress).not();
+        return returnIfInternal(shortCircuitMacAddressMatch)
+    }
+
+    private fun returnIfInternal(shortCircuitMacAddressMatch: Match): ChainBuilder {
+        val rule = Rule(Target.RETURN)
         rule.addMatch(shortCircuitMacAddressMatch)
         rules.add(rule)
         matches.clear()
@@ -18,20 +28,44 @@ class ChainBuilder(val name: String) {
     }
 
     fun ifBetween(startHour: Int, startMinute: Int, endHour: Int, endMinute: Int): ChainBuilder {
+        val scheduleMatch = createScheduleMatch(startHour, startMinute, endHour, endMinute)
+        matches.add(scheduleMatch)
+        return this
+    }
 
+    fun ifBetweenLocal(startHour: Int, startMinute: Int, endHour: Int, endMinute: Int): ChainBuilder {
+        val scheduleMatch = createScheduleMatch(startHour, startMinute, endHour, endMinute)
+        scheduleMatch.setUseKernelTZ(true)
+        matches.add(scheduleMatch)
+        return this
+    }
+
+    private fun createScheduleMatch(
+        startHour: Int,
+        startMinute: Int,
+        endHour: Int,
+        endMinute: Int
+    ): TimeExtensionMatch {
+        val (startTime, endTime) = createSchedule(startHour, startMinute, endHour, endMinute)
+        val scheduleMatch = TimeExtensionMatch()
+        scheduleMatch.setStart(startTime)
+        scheduleMatch.setEnd(endTime)
+        return scheduleMatch
+    }
+
+    private fun createSchedule(
+        startHour: Int,
+        startMinute: Int,
+        endHour: Int,
+        endMinute: Int
+    ): Pair<LocalTime, LocalTime> {
         val schedule = TimeSchedule()
 
         val startTime = LocalTime.of(startHour, startMinute)
         val endTime = LocalTime.of(endHour, endMinute)
 
         schedule.add(TimeRange(startTime, endTime))
-        val scheduleMatch = TimeExtensionMatch()
-        scheduleMatch.setStart(startTime)
-        scheduleMatch.setEnd(endTime)
-
-        matches.add(scheduleMatch)
-
-        return this
+        return Pair(startTime, endTime)
     }
 
     fun ifContains(keyword: String): ChainBuilder {
@@ -77,10 +111,20 @@ class ChainBuilder(val name: String) {
     }
 
     fun reject(): ChainBuilder {
-        val rule = Rule(ActionComponent.RejectActionComponent())
+        val rule = Rule(Target.REJECT_WITH_RESET)
         matches.forEach(rule::addMatch)
         rules.add(rule)
         matches.clear()
+        return this
+    }
+
+    fun ifIp(s: String): ChainBuilder {
+        matches.add(DestinationMatch(s))
+        return this
+    }
+
+    fun ifProtocol(protocol: Protocol): ChainBuilder {
+        matches.add(ProtocolMatch.match(protocol))
         return this
     }
 }

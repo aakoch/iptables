@@ -9,7 +9,7 @@ import com.adamkoch.iptables.matches.Match
  * @author aakoch
  */
 @Unstable
-class ScheduledRule(match: Match?, actionComponent: ActionComponent?) //
+class ScheduledRule(match: Match?, target: Target?) //
 //  public ScheduledRule(final String chain, final RuleSpecification ruleSpec, final Options options) {
 //    super(chain, ruleSpec, options);
 //  }
@@ -92,4 +92,4 @@ class ScheduledRule(match: Match?, actionComponent: ActionComponent?) //
 //
 //    return timeRangeToDayMaps;
 //  }
-    : Rule(actionComponent!!)
+    : Rule(target!!)

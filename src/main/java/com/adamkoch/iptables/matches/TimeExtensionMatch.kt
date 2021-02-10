@@ -84,7 +84,11 @@ import java.util.*
  * @since 0.1.0
  */
 // TODO: this needs work/more thought. Are we allowing for open-ended matches? We should. Instead of having separate start and end just have options? Hmm...
+// Nail down the relationship with DateTimeExtensionMatchOption. Hint: why do both have useKernelTZ?
 class TimeExtensionMatch : ExtensionMatch("time") {
+    override val rank: Int = 50
+
+    private var useKernelTZ: Boolean = false
     var start: Optional<DateTimeExtensionMatchOption>
         private set
     var end: Optional<DateTimeExtensionMatchOption>
@@ -160,8 +164,12 @@ class TimeExtensionMatch : ExtensionMatch("time") {
             }
             optionsStringBuilder.deleteCharAt(optionsStringBuilder.length - 1)
         }
-        return "-m " + super.type + if (optionsStringBuilder.isEmpty()) "" else " " + optionsStringBuilder.toString()
+        return "-m " + super.type + (if(useKernelTZ) " --kerneltz" else "") + if (optionsStringBuilder.isEmpty()) "" else " " + optionsStringBuilder.toString()
             .trim { it <= ' ' }
+    }
+
+    fun setUseKernelTZ(b: Boolean) {
+        useKernelTZ = b
     }
 
     init {

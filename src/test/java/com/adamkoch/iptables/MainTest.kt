@@ -1,6 +1,5 @@
 package com.adamkoch.iptables
 
-import com.adamkoch.iptables.ActionComponent.ReturnActionComponent
 import com.adamkoch.iptables.Util.sanitize
 import com.adamkoch.iptables.matches.MacAddressMatch
 import com.adamkoch.iptables.matches.Match
@@ -14,8 +13,8 @@ internal class MainTest {
     fun testSimpleChain() {
         val joelsOmen = Device("Joel's Omen", MacAddress("00:00:00:00:00:00"))
         val match = MacAddressMatch(joelsOmen.macAddress).not()
-        val actionComponent: ActionComponent = ReturnActionComponent()
-        val returnMacNotMatchingRule = createRule(actionComponent, match)
+        val target = Target.RETURN
+        val returnMacNotMatchingRule = createRule(target, match)
         Assertions.assertEquals(
             "-m mac ! --mac-source 00:00:00:00:00:00 -j RETURN",
             returnMacNotMatchingRule.asString()
@@ -27,7 +26,7 @@ internal class MainTest {
             "$name -m mac ! --mac-source 00:00:00:00:00:00 -j RETURN",
             chain.toString()
         )
-        val sc = ScriptWriter()
+        val sc = ScriptWriter("A")
         sc.add(chain)
         Assertions.assertEquals(
             """
@@ -48,8 +47,8 @@ internal class MainTest {
 //            // iptables -A Adam -p tcp -m time --kerneltz --timestart 18:45 --timestop 18:48 --weekdays Mon,Tue,Wed,Thu,Fri -j REJECT
     }
 
-    private fun createRule(actionComponent: ActionComponent, match: Match): Rule {
-        val rule = Rule(actionComponent)
+    private fun createRule(target: Target, match: Match): Rule {
+        val rule = Rule(target)
         rule.addMatch(match)
         return rule
     }

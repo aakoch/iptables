@@ -9,7 +9,7 @@ import java.util.*
  * @author aakoch
  */
 @Unstable
-class ScriptWriter {
+class ScriptWriter(val appendInsertDelete: String) {
     private val chains: MutableList<Chain> = ArrayList()
     fun add(chain: Chain) {
         chains.add(chain)
@@ -35,7 +35,7 @@ class ScriptWriter {
             sb.append(sanitizedChainName)
             sb.append(System.lineSeparator())
             for (rule in chain.getRules()) {
-                sb.append("iptables -A ")
+                sb.append("iptables -$appendInsertDelete ")
                 sb.append(sanitizedChainName)
                 sb.append(" ")
                 sb.append(rule.asString())

@@ -3,9 +3,6 @@ package com.adamkoch.iptables
 import java.util.Properties
 import com.adamkoch.iptables.objects.Device
 import com.adamkoch.iptables.objects.MacAddress
-import com.adamkoch.iptables.ActionComponent.ReturnActionComponent
-import com.adamkoch.iptables.ActionComponent.RejectActionComponent
-import com.adamkoch.iptables.ActionComponent.DropActionComponent
 import com.adamkoch.iptables.DayOfWeekSchedule.Companion.WEEKDAYS
 import java.time.LocalTime
 import java.io.FileWriter
@@ -84,10 +81,10 @@ class Main(
         val joelsOmenChain = Chain(Util.sanitize(joelsOmen.name))
         val match = MacAddressMatch(joelsOmen.macAddress).not()
         //    ActionComponent actionComponent = new DenyActionComponent();
-        val returnActionComponent: ActionComponent = ReturnActionComponent()
-        val tcpRejectActionComponent: ActionComponent = RejectActionComponent(false)
-        val udpRejectActionComponent: ActionComponent = RejectActionComponent(false)
-        val dropActionComponent: ActionComponent = DropActionComponent()
+        val returnActionComponent = Target.RETURN
+        val tcpRejectActionComponent = Target.REJECT
+        val udpRejectActionComponent = Target.REJECT
+        val dropActionComponent = Target.DROP
         val returnMacNotMatching = createRule(returnActionComponent, match)
         val macAddressMatch: Match = MacAddressMatch(joelsOmen.macAddress)
         val discordTcpMatch: Match = TcpKeywordMatch("discord")
@@ -101,7 +98,7 @@ class Main(
         joelsOmenChain.add(discordTcpRule)
         joelsOmenChain.add(discordUdp1Rule)
         joelsOmenChain.add(discordUdp2Rule)
-        val scriptWriter = ScriptWriter()
+        val scriptWriter = ScriptWriter("A")
         scriptWriter.add(joelsOmenChain)
         println(scriptWriter)
 
@@ -149,8 +146,8 @@ class Main(
 //    writeToFile("Alyssa", rules);
     }
 
-    private fun createRule(actionComponent: ActionComponent, vararg matches: Match): Rule {
-        val rule = Rule(actionComponent)
+    private fun createRule(target: Target, vararg matches: Match): Rule {
+        val rule = Rule(target)
         rule.addMatch(*matches)
         return rule
     }

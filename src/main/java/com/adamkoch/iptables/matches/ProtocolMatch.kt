@@ -33,6 +33,19 @@ class ProtocolMatch private constructor(private val protocol: Protocol) : Match 
 
 
     companion object {
+        fun match(protocol: Protocol): ProtocolMatch {
+            return if (protocol == Protocol.ICMP)
+                ICMP
+            else if (protocol == Protocol.TCP)
+                TCP
+            else if (protocol == Protocol.IP)
+                IP
+            else if (protocol == Protocol.UDP)
+                UDP
+            else
+                TCP
+        }
+
         @JvmField val ICMP = ProtocolMatch(Protocol.ICMP)
         @JvmField val TCP = ProtocolMatch(Protocol.TCP)
         @JvmField val IP = ProtocolMatch(Protocol.IP)

@@ -7,9 +7,6 @@ import java.util.*
 
 abstract class DateTimeExtensionMatchOption protected constructor(protected val temporal: Temporal) :
 
-/**
- *
- */
     GenericExtensionMatchOption(Arrays.asList("--date", "--time")) {
 
 

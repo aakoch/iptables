@@ -1,7 +1,6 @@
 package com.adamkoch.iptables
 
 import com.adamkoch.annotations.Unstable
-import com.adamkoch.iptables.ActionComponent
 import com.adamkoch.iptables.matches.Match
 import org.springframework.lang.Nullable
 import java.util.ArrayList
@@ -14,7 +13,7 @@ import java.util.Arrays
  * @author aakoch
  */
 @Unstable
-open class Rule(val actionComponent: ActionComponent) {
+open class Rule(val target: Target) {
     val matches: MutableList<Match>
 
     fun comment(): String? {
@@ -53,7 +52,7 @@ open class Rule(val actionComponent: ActionComponent) {
         val comparator = Comparator { match1: Match, match2: Match -> match2.rank - match1.rank }
 
 
-        return matches.sortedWith(comparator).joinToString (" ", transform = Match::asString ) + " " + actionComponent.toString()
+        return matches.sortedWith(comparator).joinToString (" ", transform = Match::asString ) + " -j " + target.toString()
     }
 
     fun addMatch(vararg matches: Match) {

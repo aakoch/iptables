@@ -1,9 +1,9 @@
 package com.adamkoch.iptables
 
-import com.adamkoch.iptables.ActionComponent.*
 import com.adamkoch.iptables.Util.sanitize
 import com.adamkoch.iptables.matches.*
 import com.adamkoch.iptables.objects.MacAddress
+import com.adamkoch.iptables.objects.Protocol
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.io.FileReader
@@ -19,18 +19,29 @@ internal class ChainTest {
         properties.load(FileReader("secrets.properties"))
 
         val chainBuilder = ChainBuilder("Joel's Omen")
-            .returnIf(MacAddress(properties.getProperty("joel.omen.mac")))
-            .ifBetween(8, 0, 11, 0)
+            .returnIfNot(MacAddress(properties.getProperty("joel.omen.mac")))
+            .ifBetweenLocal(8, 0, 11, 0)
             .ifContains("discord")
             .reject()
-            .ifBetween(12, 0, 15, 0)
+            .ifBetweenLocal(12, 0, 15, 0)
             .ifContains("discord")
             .reject()
+            .ifBetweenLocal(8, 0, 11, 0)
+            .ifIp("159.153.191.238")
+            .ifProtocol(Protocol.TCP)
+            .reject()
+            .ifBetweenLocal(12, 0, 15, 0)
+            .ifIp("159.153.191.238")
+            .ifProtocol(Protocol.TCP)
+            .reject()
+
+
+
 
         val omenChain = Chain("Joel's Omen")
         val shortCircuitMacAddress = MacAddress(properties.getProperty("joel.omen.mac"))
-        val shortCircuitMacAddressMatch = MacAddressMatch(shortCircuitMacAddress);
-        val shortCircuitMacAddressRule = Rule(ActionComponent.ReturnActionComponent())
+        val shortCircuitMacAddressMatch = MacAddressMatch(shortCircuitMacAddress).not();
+        val shortCircuitMacAddressRule = Rule(Target.RETURN)
         shortCircuitMacAddressRule.addMatch(shortCircuitMacAddressMatch)
 
         omenChain.add(shortCircuitMacAddressRule)
@@ -44,6 +55,7 @@ internal class ChainTest {
         val schoolMorningsMatch = TimeExtensionMatch()
         schoolMorningsMatch.setStart(schoolStartTime)
         schoolMorningsMatch.setEnd(lunchStartTime)
+        schoolMorningsMatch.setUseKernelTZ(true)
 
         val schoolAfternoonsMatch = TimeExtensionMatch()
 
@@ -52,23 +64,36 @@ internal class ChainTest {
 
         schoolAfternoonsMatch.setStart(lunchEndTime)
         schoolAfternoonsMatch.setEnd(schoolEndTime)
+        schoolAfternoonsMatch.setUseKernelTZ(true)
 
         val discordTcpKeywordMatch = TcpKeywordMatch("discord")
 
-        val preventDiscordMorningsRule = Rule(ActionComponent.RejectActionComponent())
+        val preventDiscordMorningsRule = Rule(Target.REJECT_WITH_RESET)
         preventDiscordMorningsRule.addMatch(discordTcpKeywordMatch, schoolMorningsMatch)
         omenChain.add(preventDiscordMorningsRule)
 
-        val preventDiscordAfternoonsRule = Rule(ActionComponent.RejectActionComponent())
+        val preventDiscordAfternoonsRule = Rule(Target.REJECT_WITH_RESET)
         preventDiscordAfternoonsRule.addMatch(discordTcpKeywordMatch, schoolAfternoonsMatch)
         omenChain.add(preventDiscordAfternoonsRule)
 
-        System.out.println(omenChain.toString())
-        System.out.println(chainBuilder.toString())
 
-        assertEquals(omenChain.toString(), chainBuilder.toString())
+        val destinationMatch = DestinationMatch("159.153.191.238")
 
-        val writer = ScriptWriter()
+        val morningsDestinationMatchRule = Rule(Target.REJECT_WITH_RESET)
+        morningsDestinationMatchRule.addMatch(ProtocolMatch.TCP, destinationMatch, schoolMorningsMatch)
+        omenChain.add(morningsDestinationMatchRule)
+
+
+        val afternoonsDestinationMatchRule = Rule(Target.REJECT_WITH_RESET)
+        afternoonsDestinationMatchRule.addMatch(ProtocolMatch.TCP, destinationMatch, schoolAfternoonsMatch)
+        omenChain.add(afternoonsDestinationMatchRule)
+
+        println(omenChain.toString())
+        println(chainBuilder.toString())
+
+        assertEquals(System.lineSeparator() + omenChain.toString(), System.lineSeparator() + chainBuilder.toString())
+
+        val writer = ScriptWriter("A")
         writer.add(omenChain)
         println(writer.toString())
     }
@@ -80,8 +105,8 @@ internal class ChainTest {
         chain.add(macAddrRule)
         chain.add(webstrRule)
         Assertions.assertEquals(
-            "Adams_Computer -m mac --mac-source 00:00:00:a1:2b:cc -j DROP" + System.lineSeparator()
-                    + "Adams_Computer -m webstr --url keyword -j REJECT --reject-with tcp-reset",
+            "$SANITIZED_CHAIN_NAME -m mac --mac-source 00:00:00:a1:2b:cc -j DROP" + System.lineSeparator()
+                    + "$SANITIZED_CHAIN_NAME -m webstr --url keyword -j REJECT --reject-with tcp-reset",
             chain.toString()
         )
     }
@@ -92,8 +117,8 @@ internal class ChainTest {
         chain.add(allowMacAddrRule)
         chain.add(webstrRule)
         Assertions.assertEquals(
-            "Adams_Computer -m mac --mac-source 00:00:00:a1:2b:cc -j ACCEPT" + System.lineSeparator()
-                    + "Adams_Computer -m webstr --url keyword -j REJECT --reject-with tcp-reset",
+            "$SANITIZED_CHAIN_NAME -m mac --mac-source 00:00:00:a1:2b:cc -j ACCEPT" + System.lineSeparator()
+                    + "$SANITIZED_CHAIN_NAME -m webstr --url keyword -j REJECT --reject-with tcp-reset",
             chain.toString()
         )
     }
@@ -104,8 +129,8 @@ internal class ChainTest {
         chain.add(returnWhenNotMacAddrRule)
         chain.add(webstrRule)
         Assertions.assertEquals(
-            "Adams_Computer -m mac ! --mac-source 00:00:00:a1:2b:cc -j RETURN" + System.lineSeparator()
-                    + "Adams_Computer -m webstr --url keyword -j REJECT --reject-with tcp-reset",
+            "$SANITIZED_CHAIN_NAME -m mac ! --mac-source 00:00:00:a1:2b:cc -j RETURN" + System.lineSeparator()
+                    + "$SANITIZED_CHAIN_NAME -m webstr --url keyword -j REJECT --reject-with tcp-reset",
             chain.toString()
         )
 
@@ -116,27 +141,27 @@ internal class ChainTest {
     }
 
     private val webstrRule: Rule
-        private get() {
-            val rule = Rule(RejectActionComponent())
+        get() {
+            val rule = Rule(Target.REJECT_WITH_RESET)
             val match: Match = WebStringExtensionMatch("keyword")
             rule.addMatch(match)
             return rule
         }
     private val macAddrRule: Rule
-        private get() {
-            val rule = Rule(DropActionComponent())
+        get() {
+            val rule = Rule(Target.DROP)
             rule.addMatch(MacAddressMatch(MacAddress.DUMMY))
             return rule
         }
     private val allowMacAddrRule: Rule
-        private get() {
-            val rule = Rule(AcceptActionComponent())
+        get() {
+            val rule = Rule(Target.ACCEPT)
             rule.addMatch(MacAddressMatch(MacAddress.DUMMY))
             return rule
         }
     private val returnWhenNotMacAddrRule: Rule
-        private get() {
-            val rule = Rule(ReturnActionComponent())
+        get() {
+            val rule = Rule(Target.RETURN)
             rule.addMatch(MacAddressMatch(MacAddress.DUMMY).not())
             return rule
         }
