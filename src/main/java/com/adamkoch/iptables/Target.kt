@@ -10,7 +10,7 @@ enum class Target(private val command: String) {
     // IPV6
     // icmp6-no-route, no-route, icmp6-adm-prohibited, adm-prohibited, icmp6-addr-unreachable, addr-unreach, or icmp6-port-unreachable
 
-    REJECT_WITH_RESET("REJECT --reject-with tcp-reset"),
+    REJECT_WITH_TCP_RESET("REJECT --reject-with tcp-reset"),
     RETURN("RETURN"),
     ACCEPT("ACCEPT");
 

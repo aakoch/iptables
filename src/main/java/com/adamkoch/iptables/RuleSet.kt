@@ -1,7 +1,6 @@
 package com.adamkoch.iptables
 
 import com.adamkoch.annotations.Unstable
-import com.adamkoch.iptables.Target
 import com.adamkoch.iptables.matches.*
 import com.adamkoch.iptables.objects.MacAddress
 import java.util.*
@@ -29,13 +28,13 @@ class RuleSet(
         val keywordMatch2: Match = Udp1KeywordMatch(keyword)
         val keywordMatch3: Match = Udp2KeywordMatch(keyword, "$routerIpAddress/32")
         val macAddressMatchingComponent = MacAddressMatch(macAddress!!)
-        val rule1 = Rule(Target.REJECT_WITH_RESET)
+        val rule1 = Rule(Target.REJECT_WITH_TCP_RESET)
         rule1.addMatch(keywordMatchingComponent1)
         rules.add(rule1)
-        val rule2 = Rule(Target.REJECT_WITH_RESET)
+        val rule2 = Rule(Target.REJECT_WITH_TCP_RESET)
         rule2.addMatch(keywordMatch2)
         rules.add(rule2)
-        val rule3 = Rule(Target.REJECT_WITH_RESET)
+        val rule3 = Rule(Target.REJECT_WITH_TCP_RESET)
         rule3.addMatch(keywordMatch3)
         rules.add(rule3)
         rules.forEach(Consumer { rule: Rule -> rule.addMatch(macAddressMatchingComponent) })

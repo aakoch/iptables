@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 internal class RuleTest {
     @Test
     fun test() {
-        val rule = Rule(Target.REJECT_WITH_RESET)
+        val rule = Rule(Target.REJECT_WITH_TCP_RESET)
         val match: Match = MacAddressMatch(MacAddress.DUMMY)
         rule.addMatch(match)
         Assertions.assertEquals(

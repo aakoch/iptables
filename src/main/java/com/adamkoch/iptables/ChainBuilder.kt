@@ -110,8 +110,8 @@ class ChainBuilder(val name: String) {
         return sb.toString()
     }
 
-    fun reject(): ChainBuilder {
-        val rule = Rule(Target.REJECT_WITH_RESET)
+    fun rejectWithTcpReset(): ChainBuilder {
+        val rule = Rule(Target.REJECT_WITH_TCP_RESET)
         matches.forEach(rule::addMatch)
         rules.add(rule)
         matches.clear()

@@ -18,6 +18,7 @@ public class SshTest {
   public void test(final List<String> commandList) {
 
     final Properties properties = new Properties();
+
     try {
       properties.load(new FileReader("secrets.properties"));
     }

@@ -22,18 +22,18 @@ internal class ChainTest {
             .returnIfNot(MacAddress(properties.getProperty("joel.omen.mac")))
             .ifBetweenLocal(8, 0, 11, 0)
             .ifContains("discord")
-            .reject()
+            .rejectWithTcpReset()
             .ifBetweenLocal(12, 0, 15, 0)
             .ifContains("discord")
-            .reject()
+            .rejectWithTcpReset()
             .ifBetweenLocal(8, 0, 11, 0)
             .ifIp("159.153.191.238")
             .ifProtocol(Protocol.TCP)
-            .reject()
+            .rejectWithTcpReset()
             .ifBetweenLocal(12, 0, 15, 0)
             .ifIp("159.153.191.238")
             .ifProtocol(Protocol.TCP)
-            .reject()
+            .rejectWithTcpReset()
 
 
 
@@ -68,23 +68,23 @@ internal class ChainTest {
 
         val discordTcpKeywordMatch = TcpKeywordMatch("discord")
 
-        val preventDiscordMorningsRule = Rule(Target.REJECT_WITH_RESET)
+        val preventDiscordMorningsRule = Rule(Target.REJECT_WITH_TCP_RESET)
         preventDiscordMorningsRule.addMatch(discordTcpKeywordMatch, schoolMorningsMatch)
         omenChain.add(preventDiscordMorningsRule)
 
-        val preventDiscordAfternoonsRule = Rule(Target.REJECT_WITH_RESET)
+        val preventDiscordAfternoonsRule = Rule(Target.REJECT_WITH_TCP_RESET)
         preventDiscordAfternoonsRule.addMatch(discordTcpKeywordMatch, schoolAfternoonsMatch)
         omenChain.add(preventDiscordAfternoonsRule)
 
 
         val destinationMatch = DestinationMatch("159.153.191.238")
 
-        val morningsDestinationMatchRule = Rule(Target.REJECT_WITH_RESET)
+        val morningsDestinationMatchRule = Rule(Target.REJECT_WITH_TCP_RESET)
         morningsDestinationMatchRule.addMatch(ProtocolMatch.TCP, destinationMatch, schoolMorningsMatch)
         omenChain.add(morningsDestinationMatchRule)
 
 
-        val afternoonsDestinationMatchRule = Rule(Target.REJECT_WITH_RESET)
+        val afternoonsDestinationMatchRule = Rule(Target.REJECT_WITH_TCP_RESET)
         afternoonsDestinationMatchRule.addMatch(ProtocolMatch.TCP, destinationMatch, schoolAfternoonsMatch)
         omenChain.add(afternoonsDestinationMatchRule)
 
@@ -142,7 +142,7 @@ internal class ChainTest {
 
     private val webstrRule: Rule
         get() {
-            val rule = Rule(Target.REJECT_WITH_RESET)
+            val rule = Rule(Target.REJECT_WITH_TCP_RESET)
             val match: Match = WebStringExtensionMatch("keyword")
             rule.addMatch(match)
             return rule
