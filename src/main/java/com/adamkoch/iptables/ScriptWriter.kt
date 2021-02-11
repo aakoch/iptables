@@ -9,7 +9,7 @@ import java.util.*
  * @author aakoch
  */
 @Unstable
-class ScriptWriter(val appendInsertDelete: String) {
+class ScriptWriter(val appendInsertDelete: CommandOption) {
     private val chains: MutableList<Chain> = ArrayList()
     fun add(chain: Chain) {
         chains.add(chain)

@@ -8,27 +8,27 @@ import java.time.*
 internal class TimeExtensionMatchTest {
     @Test
     fun asString() {
-        val match = TimeExtensionMatch()
+        val match = DateTimeMatch()
         Assertions.assertEquals("-m time", match.asString())
     }
 
     @Test
     fun withStartDate() {
-        val match = TimeExtensionMatch()
+        val match = DateTimeMatch()
         match.setStart(LocalDate.of(2020, 4, 4))
         Assertions.assertEquals("-m time --datestart 2020-04-04", match.asString())
     }
 
     @Test
     fun withEndDate() {
-        val match = TimeExtensionMatch()
+        val match = DateTimeMatch()
         match.setEnd(LocalDate.of(2020, 4, 4))
         Assertions.assertEquals("-m time --datestop 2020-04-04", match.asString())
     }
 
     @Test
     fun withStartAndEndDate() {
-        val match = TimeExtensionMatch()
+        val match = DateTimeMatch()
         match.setStart(LocalDate.of(2020, 4, 4))
         match.setEnd(LocalDate.of(2020, 4, 4))
         Assertions.assertEquals(
@@ -39,21 +39,21 @@ internal class TimeExtensionMatchTest {
 
     @Test
     fun withStartTime() {
-        val match = TimeExtensionMatch()
+        val match = DateTimeMatch()
         match.setStart(LocalTime.of(4, 4, 4))
         Assertions.assertEquals("-m time --timestart 04:04:04", match.asString())
     }
 
     @Test
     fun withEndTime() {
-        val match = TimeExtensionMatch()
+        val match = DateTimeMatch()
         match.setEnd(LocalTime.of(4, 4, 4))
         Assertions.assertEquals("-m time --timestop 04:04:04", match.asString())
     }
 
     @Test
     fun withStartAndEndTime() {
-        val match = TimeExtensionMatch()
+        val match = DateTimeMatch()
         match.setStart(LocalTime.of(5, 5, 5))
         match.setEnd(LocalTime.of(4, 4, 4))
         Assertions.assertEquals(
@@ -64,7 +64,7 @@ internal class TimeExtensionMatchTest {
 
     @Test
     fun withContiguous() {
-        val match = TimeExtensionMatch()
+        val match = DateTimeMatch()
         match.setStart(LocalTime.of(5, 5, 5))
         match.setEnd(LocalTime.of(4, 4, 4))
         match.setContiguous()
@@ -76,14 +76,14 @@ internal class TimeExtensionMatchTest {
 
     @Test
     fun withStartDateTime() {
-        val match = TimeExtensionMatch()
+        val match = DateTimeMatch()
         match.setStart(LocalDateTime.of(2020, 5, 6, 7, 8, 9))
         Assertions.assertEquals("-m time --datestart 2020-05-06T07:08:09", match.asString())
     }
 
     @Test
     fun withWeekdaysTime() {
-        val match = TimeExtensionMatch()
+        val match = DateTimeMatch()
         match.days =
             arrayOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY)
         Assertions.assertEquals("-m time --weekdays Mon,Tue,Thu,Fri", match.asString())
@@ -91,21 +91,21 @@ internal class TimeExtensionMatchTest {
 
     @Test
     fun withWeekDays() {
-        val match = TimeExtensionMatch()
+        val match = DateTimeMatch()
         match.days = DayOfWeekSchedule.WEEKDAYS
         Assertions.assertEquals("-m time --weekdays Mon,Tue,Wed,Thu,Fri", match.asString())
     }
 
     @Test
     fun withWeekends() {
-        val match = TimeExtensionMatch()
+        val match = DateTimeMatch()
         match.days = DayOfWeekSchedule.WEEKENDS
         Assertions.assertEquals("-m time --weekdays Sat,Sun", match.asString())
     }
 
     @Test
     fun withTimezone() {
-        val match = TimeExtensionMatch()
+        val match = DateTimeMatch()
         match.setStart(Instant.EPOCH)
         Assertions.assertEquals(
             "-m time --datestart 1970-01-01T00:00:00 --kerneltz",

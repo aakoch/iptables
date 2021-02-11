@@ -85,7 +85,7 @@ import java.util.*
  */
 // TODO: this needs work/more thought. Are we allowing for open-ended matches? We should. Instead of having separate start and end just have options? Hmm...
 // Nail down the relationship with DateTimeExtensionMatchOption. Hint: why do both have useKernelTZ?
-class TimeExtensionMatch : ExtensionMatch("time") {
+class DateTimeMatch : ExtensionMatch("time") {
     override val rank: Int = 50
 
     private var useKernelTZ: Boolean = false
@@ -112,22 +112,27 @@ class TimeExtensionMatch : ExtensionMatch("time") {
     /**
      * Allows for an Instant, LocalDateTime, DateTime, etc.
      */
-    fun to(endTemporal: Temporal): TimeExtensionMatch {
+    fun to(endTemporal: Temporal): DateTimeMatch {
         val newStringExtensionMatch = copy()
         newStringExtensionMatch.end = Optional.of(EndDateTimeExtensionMatchOption(endTemporal))
         return newStringExtensionMatch
     }
 
-    fun from(startTemporal: Temporal): TimeExtensionMatch {
+    fun from(startTemporal: Temporal): DateTimeMatch {
         val newStringExtensionMatch = copy()
         newStringExtensionMatch.start =
             Optional.of(StartDateTimeExtensionMatchOption(startTemporal))
         return newStringExtensionMatch
     }
 
-    private fun copy(): TimeExtensionMatch {
-        val newStringExtensionMatch = TimeExtensionMatch()
+    private fun copy(): DateTimeMatch {
+        val newStringExtensionMatch = DateTimeMatch()
         newStringExtensionMatch.extensionMatchOptions = extensionMatchOptions
+        newStringExtensionMatch.useKernelTZ = useKernelTZ
+        newStringExtensionMatch.days = days
+        newStringExtensionMatch.contiguousFlag = contiguousFlag
+        newStringExtensionMatch.end = end
+        newStringExtensionMatch.start = start
         return newStringExtensionMatch
     }
 

@@ -45,27 +45,11 @@ class ChainBuilder(val name: String) {
         startMinute: Int,
         endHour: Int,
         endMinute: Int
-    ): TimeExtensionMatch {
-        val (startTime, endTime) = createSchedule(startHour, startMinute, endHour, endMinute)
-        val scheduleMatch = TimeExtensionMatch()
-        scheduleMatch.setStart(startTime)
-        scheduleMatch.setEnd(endTime)
+    ): DateTimeMatch {
+        val scheduleMatch = DateTimeMatch()
+        scheduleMatch.setStart(LocalTime.of(startHour, startMinute))
+        scheduleMatch.setEnd(LocalTime.of(endHour, endMinute))
         return scheduleMatch
-    }
-
-    private fun createSchedule(
-        startHour: Int,
-        startMinute: Int,
-        endHour: Int,
-        endMinute: Int
-    ): Pair<LocalTime, LocalTime> {
-        val schedule = TimeSchedule()
-
-        val startTime = LocalTime.of(startHour, startMinute)
-        val endTime = LocalTime.of(endHour, endMinute)
-
-        schedule.add(TimeRange(startTime, endTime))
-        return Pair(startTime, endTime)
     }
 
     fun ifContains(keyword: String): ChainBuilder {
@@ -118,7 +102,7 @@ class ChainBuilder(val name: String) {
         return this
     }
 
-    fun ifIp(s: String): ChainBuilder {
+    fun ifDestinationIp(s: String): ChainBuilder {
         matches.add(DestinationMatch(s))
         return this
     }

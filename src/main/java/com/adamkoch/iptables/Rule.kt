@@ -48,11 +48,7 @@ open class Rule(val target: Target) {
     //        device.getMacAddress(), keyword);
     //  }
     open fun asString(): String {
-
-        val comparator = Comparator { match1: Match, match2: Match -> match2.rank - match1.rank }
-
-
-        return matches.sortedWith(comparator).joinToString (" ", transform = Match::asString ) + " -j " + target.toString()
+        return matches.sorted().joinToString (" ", transform = Match::asString ) + " -j " + target.toString()
     }
 
     fun addMatch(vararg matches: Match) {

@@ -98,7 +98,7 @@ class Main(
         joelsOmenChain.add(discordTcpRule)
         joelsOmenChain.add(discordUdp1Rule)
         joelsOmenChain.add(discordUdp2Rule)
-        val scriptWriter = ScriptWriter("A")
+        val scriptWriter = ScriptWriter(CommandOption.APPEND)
         scriptWriter.add(joelsOmenChain)
         println(scriptWriter)
 

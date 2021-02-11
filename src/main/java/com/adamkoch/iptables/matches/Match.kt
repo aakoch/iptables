@@ -6,7 +6,7 @@ package com.adamkoch.iptables.matches
  * @author aakoch
  * @since 0.1.0
  */
-interface Match {
+interface Match : Comparable<Match> {
     abstract val rank: Int
 
     /**
@@ -16,4 +16,8 @@ interface Match {
      * @return A string representation
      */
     fun asString(): String
+
+    override fun compareTo(other: Match): Int {
+        return other.rank - this.rank
+    }
 }

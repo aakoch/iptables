@@ -26,7 +26,7 @@ internal class MainTest {
             "$name -m mac ! --mac-source 00:00:00:00:00:00 -j RETURN",
             chain.toString()
         )
-        val sc = ScriptWriter("A")
+        val sc = ScriptWriter(CommandOption.APPEND)
         sc.add(chain)
         Assertions.assertEquals(
             """
@@ -51,18 +51,5 @@ internal class MainTest {
         val rule = Rule(target)
         rule.addMatch(match)
         return rule
-    }
-
-    @Test
-    fun testRuleSet() {
-        //  -m time --kerneltz --timestart 07:45 --timestop 11:00 --weekdays Mon,Tue,Wed,Thu,Fri
-        val ruleSet = RuleSet("discord", "FORWARD", MacAddress("00:00:00:00:01"), "255.255.255.255")
-        val actual = ruleSet.toString()
-        Assertions.assertEquals(
-            """-p tcp -m webstr --url discord -m mac --mac-source 00:00:00:00:01 -j REJECT --reject-with tcp-reset
--i br0 -p udp -m udp --dport 53 -m string --string "discord" --algo bm --to 65535 --icase -m mac --mac-source 00:00:00:00:01 -j REJECT --reject-with tcp-reset
--d 255.255.255.255/32 -i br0 -p udp -m udp --dport 53 -m string --string "discord" --algo bm --to 65535 --icase -m mac --mac-source 00:00:00:00:01 -j REJECT --reject-with tcp-reset""",
-            actual
-        )
     }
 }

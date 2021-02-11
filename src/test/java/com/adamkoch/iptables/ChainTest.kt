@@ -27,16 +27,13 @@ internal class ChainTest {
             .ifContains("discord")
             .rejectWithTcpReset()
             .ifBetweenLocal(8, 0, 11, 0)
-            .ifIp("159.153.191.238")
+            .ifDestinationIp("159.153.191.238")
             .ifProtocol(Protocol.TCP)
             .rejectWithTcpReset()
             .ifBetweenLocal(12, 0, 15, 0)
-            .ifIp("159.153.191.238")
+            .ifDestinationIp("159.153.191.238")
             .ifProtocol(Protocol.TCP)
             .rejectWithTcpReset()
-
-
-
 
         val omenChain = Chain("Joel's Omen")
         val shortCircuitMacAddress = MacAddress(properties.getProperty("joel.omen.mac"))
@@ -46,18 +43,16 @@ internal class ChainTest {
 
         omenChain.add(shortCircuitMacAddressRule)
 
-        val schoolMornings = TimeSchedule()
-
         val schoolStartTime = LocalTime.of(8, 0)
         val lunchStartTime = LocalTime.of(11, 0)
 
-        schoolMornings.add(TimeRange(schoolStartTime, lunchStartTime))
-        val schoolMorningsMatch = TimeExtensionMatch()
+//        schoolMornings.add(TimeRange(schoolStartTime, lunchStartTime))
+        val schoolMorningsMatch = DateTimeMatch()
         schoolMorningsMatch.setStart(schoolStartTime)
         schoolMorningsMatch.setEnd(lunchStartTime)
         schoolMorningsMatch.setUseKernelTZ(true)
 
-        val schoolAfternoonsMatch = TimeExtensionMatch()
+        val schoolAfternoonsMatch = DateTimeMatch()
 
         val lunchEndTime = LocalTime.of(12, 0)
         val schoolEndTime = LocalTime.of(15, 0)
@@ -93,9 +88,21 @@ internal class ChainTest {
 
         assertEquals(System.lineSeparator() + omenChain.toString(), System.lineSeparator() + chainBuilder.toString())
 
-        val writer = ScriptWriter("A")
+        val writer = ScriptWriter(CommandOption.APPEND)
         writer.add(omenChain)
         println(writer.toString())
+
+
+        val testRules = listOf(TimeRange(schoolStartTime, lunchStartTime), TimeRange(lunchEndTime, schoolEndTime)).map {
+            val testRule = Rule(Target.REJECT_WITH_TCP_RESET)
+            val timeRangeMatch = DateTimeMatch()
+                .from(it.startTime)
+                .to(it.endTime)
+            testRule.addMatch(timeRangeMatch)
+            testRule.asString()
+        }
+
+        println(testRules)
     }
 
 

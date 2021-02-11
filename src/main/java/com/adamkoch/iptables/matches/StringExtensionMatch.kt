@@ -37,8 +37,7 @@ package com.adamkoch.iptables.matches
  */
 
 /**
- * @param keyword Pattern to search for. Notice this is not the same parameter as the parent class {@link
- *     ExtensionMatch}!
+ * @param keyword Pattern to search for. Notice this is not the same parameter as the parent class [ExtensionMatch]!
  */
 // TODO: probably need to do some validation on the keyword
 class StringExtensionMatch(private val keyword: String) : ExtensionMatch("string"), Invertible {
