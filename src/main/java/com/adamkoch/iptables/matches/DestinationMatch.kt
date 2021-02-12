@@ -24,5 +24,5 @@ import com.adamkoch.iptables.matches.GenericMatch
  */
 class DestinationMatch(value: String) :
     GenericMatch(arrayOf("-d", "--dst", "--destination"), value) {
-    override val rank: Int = 100
+    override val weight: Int = 100
 }

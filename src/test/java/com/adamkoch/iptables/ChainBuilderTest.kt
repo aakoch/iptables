@@ -1,19 +1,68 @@
 package com.adamkoch.iptables
 
 import com.adamkoch.iptables.Util.sanitize
+import com.adamkoch.iptables.ChainBuilder
 import com.adamkoch.iptables.matches.*
 import com.adamkoch.iptables.objects.MacAddress
 import com.adamkoch.iptables.objects.Protocol
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.FileReader
 import java.time.LocalTime
 import java.util.*
-import kotlin.test.assertEquals
 
-internal class ChainTest {
+internal class ChainBuilderTest {
 
     @Test
+    @Disabled("not finished")
+    fun keyword() {
+        val properties = Properties()
+        properties.load(FileReader("secrets.properties"))
+
+        val joelOmenChain = ChainBuilder("Joel's Omen")
+            .ifContains("discord", properties.getProperty("router.ip"))
+            .rejectWithTcpReset();
+
+//        iptables -A Joels_Omen -m mac ! --mac-source 00:00:00:A1:2B:CC -j RETURN
+//        iptables -A Joels_Omen -p tcp -m webstr --url discord -j REJECT
+//                iptables -A Joels_Omen -i br0 -p udp -m udp --dport 53 -m string --string "discord" --algo bm --to 65535 --icase -j REJECT
+//        iptables -A Joels_Omen -d 192.168.50.1/32 -i br0 -p udp -m udp --dport 53 -m string --string "discord" --algo bm --to 65535 --icase -j REJECT
+
+        assertEquals(
+                "Joels_Omen -p tcp -m webstr --url discord -j REJECT\n" +
+                "Joels_Omen -i br0 -p udp -m udp --dport 53 -m string --string \"discord\" --algo bm --to 65535 --icase -j REJECT\n" +
+                "Joels_Omen -d 192.168.50.1/32 -i br0 -p udp -m udp --dport 53 -m string --string \"discord\" --algo bm --to 65535 --icase -j REJECT",
+            joelOmenChain.createString())
+    }
+
+    @Test
+    @Disabled("not finished")
+    fun keywordPlus() {
+        val properties = Properties()
+        properties.load(FileReader("secrets.properties"))
+
+        val joelOmenChain = ChainBuilder("Joel's Omen")
+            .returnIfNot(MacAddress.DUMMY)
+            .ifBetweenLocal(8, 0, 11, 0)
+            .ifContains("discord", properties.getProperty("router.ip"))
+            .rejectWithTcpReset();
+
+//        iptables -A Joels_Omen -m mac ! --mac-source 00:00:00:A1:2B:CC -j RETURN
+//        iptables -A Joels_Omen -p tcp -m webstr --url discord -j REJECT
+//                iptables -A Joels_Omen -i br0 -p udp -m udp --dport 53 -m string --string "discord" --algo bm --to 65535 --icase -j REJECT
+//        iptables -A Joels_Omen -d 192.168.50.1/32 -i br0 -p udp -m udp --dport 53 -m string --string "discord" --algo bm --to 65535 --icase -j REJECT
+
+        assertEquals("Joels_Omen -m mac ! --mac-source ${MacAddress.DUMMY} -j RETURN\n" +
+                "Joels_Omen -p tcp -m time --kerneltz --timestart 08:00 --timestop 11:00 -m webstr --url discord -j REJECT --reject-with tcp-reset\n" +
+                "Joels_Omen -i br0 -p udp -m udp --dport 53 -m string --string \"discord\" --algo bm --to 65535 --icase -j REJECT\n" +
+                "Joels_Omen -d 192.168.50.1/32 -i br0 -p udp -m udp --dport 53 -m string --string \"discord\" --algo bm --to 65535 --icase -j REJECT",
+            joelOmenChain.createString())
+    }
+
+    @Test
+    @Disabled("not finished")
     fun morningSchoolTime() {
         val properties = Properties()
         properties.load(FileReader("secrets.properties"))
@@ -21,10 +70,10 @@ internal class ChainTest {
         val chainBuilder = ChainBuilder("Joel's Omen")
             .returnIfNot(MacAddress(properties.getProperty("joel.omen.mac")))
             .ifBetweenLocal(8, 0, 11, 0)
-            .ifContains("discord")
+            .ifContains("discord", properties.getProperty("router.ip"))
             .rejectWithTcpReset()
             .ifBetweenLocal(12, 0, 15, 0)
-            .ifContains("discord")
+            .ifContains("discord", properties.getProperty("router.ip"))
             .rejectWithTcpReset()
             .ifBetweenLocal(8, 0, 11, 0)
             .ifDestinationIp("159.153.191.238")

@@ -2,10 +2,7 @@ package com.adamkoch.iptables
 
 import com.adamkoch.annotations.Unstable
 import com.adamkoch.iptables.matches.Match
-import org.springframework.lang.Nullable
 import java.util.ArrayList
-import java.util.stream.Collectors
-import java.util.Arrays
 
 /**
  *

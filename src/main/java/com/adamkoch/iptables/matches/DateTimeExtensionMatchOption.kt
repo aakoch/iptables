@@ -1,14 +1,18 @@
 package com.adamkoch.iptables.matches
 
+import com.adamkoch.annotations.Unstable
 import java.time.Instant
 import java.time.temporal.ChronoField
 import java.time.temporal.Temporal
 import java.util.*
 
+/**
+ * For use with a DateTimeMatch.
+ */
+@Unstable
 abstract class DateTimeExtensionMatchOption protected constructor(protected val temporal: Temporal) :
 
     GenericExtensionMatchOption(Arrays.asList("--date", "--time")) {
-
 
     private var useKernelTZ = true
     fun setUseKernelTZ(newValue: Boolean) {

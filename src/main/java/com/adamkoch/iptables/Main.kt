@@ -1,6 +1,5 @@
 package com.adamkoch.iptables
 
-import java.util.Properties
 import com.adamkoch.iptables.objects.Device
 import com.adamkoch.iptables.objects.MacAddress
 import com.adamkoch.iptables.DayOfWeekSchedule.Companion.WEEKDAYS
@@ -12,7 +11,7 @@ import kotlin.Throws
 import kotlin.jvm.JvmStatic
 import java.io.FileReader
 import java.time.DayOfWeek
-import java.util.ArrayList
+import java.util.*
 
 /* Do we need?
 * *filter
@@ -64,13 +63,18 @@ import java.util.ArrayList
 //                               ____________________|________________________       |
 //                              |                                            |       |
 //Rule -> iptables -A JoelsOmen -p tcp -m mac ! --mac-source 00:00:00:00:00:00 -j RETURN
-class Main(
-    private val properties: Properties
-) {
+class Main(private val properties: Properties) {
     private val tv1: Device
     private val tv2: Device
     private fun run() {
 
+        val joelOmenChain = com.adamkoch.iptables.ChainBuilder("Joel's Omen")
+            .returnIfNot(MacAddress(properties.getProperty("joel.omen.mac")))
+            .ifBetweenLocal(8, 0, 11, 0)
+            .ifContains("discord", properties.getProperty("router.ip"))
+            .rejectWithTcpReset();
+
+        println(joelOmenChain)
 
         val chains: MutableList<Chain> = ArrayList()
         val joelsDevices = createJoelsDevices()
@@ -86,11 +90,22 @@ class Main(
         val udpRejectActionComponent = Target.REJECT
         val dropActionComponent = Target.DROP
         val returnMacNotMatching = createRule(returnActionComponent, match)
-        val macAddressMatch: Match = MacAddressMatch(joelsOmen.macAddress)
-        val discordTcpMatch: Match = TcpKeywordMatch("discord")
-        val discordUdp1Match: Match = Udp1KeywordMatch("discord")
-        val discordUdp2Match: Match =
-            Udp2KeywordMatch("discord", properties.getProperty("router.ip") + "/32")
+
+        val (discordTcpMatch: Match, discordUdp1Match: Match, discordUdp2Match: Match) = keywordMatch(
+            joelsOmen,
+            "discord",
+            properties.getProperty("router.ip")
+        )
+
+        val (eaTcpMatch: Match, eaUdp1Match: Match, eaUdp2Match: Match) = keywordMatch(
+            joelsOmen,
+            "accounts.ea.com",
+            properties.getProperty("router.ip")
+        )
+
+        val ruleSet = MultipleTimeRangesRuleSet()
+
+
         val discordTcpRule = createRule(tcpRejectActionComponent, discordTcpMatch)
         val discordUdp1Rule = createRule(udpRejectActionComponent, discordUdp1Match)
         val discordUdp2Rule = createRule(udpRejectActionComponent, discordUdp2Match)
@@ -98,6 +113,7 @@ class Main(
         joelsOmenChain.add(discordTcpRule)
         joelsOmenChain.add(discordUdp1Rule)
         joelsOmenChain.add(discordUdp2Rule)
+
         val scriptWriter = ScriptWriter(CommandOption.APPEND)
         scriptWriter.add(joelsOmenChain)
         println(scriptWriter)
@@ -144,6 +160,14 @@ class Main(
 //    }
 
 //    writeToFile("Alyssa", rules);
+    }
+
+    private fun keywordMatch(joelsOmen: Device, keyword: String, ipAddress: String?): Triple<Match, Match, Match> {
+        val discordTcpMatch: Match = TcpKeywordMatch(keyword)
+        val discordUdp1Match: Match = Udp1KeywordMatch(keyword)
+        val discordUdp2Match: Match =
+            Udp2KeywordMatch(keyword, ipAddress + "/32")
+        return Triple(discordTcpMatch, discordUdp1Match, discordUdp2Match)
     }
 
     private fun createRule(target: Target, vararg matches: Match): Rule {

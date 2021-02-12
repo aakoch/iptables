@@ -16,6 +16,7 @@ class Chain(val name: String) {
     private val rules: MutableList<Rule>
     override fun toString(): String {
         val sanitized = Util.sanitize(name)
+
         return rules.stream().map { rule: Rule -> sanitized + " " + rule.asString() }
             .collect(Collectors.joining(System.lineSeparator()))
 

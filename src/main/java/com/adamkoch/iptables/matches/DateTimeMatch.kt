@@ -86,13 +86,11 @@ import java.util.*
 // TODO: this needs work/more thought. Are we allowing for open-ended matches? We should. Instead of having separate start and end just have options? Hmm...
 // Nail down the relationship with DateTimeExtensionMatchOption. Hint: why do both have useKernelTZ?
 class DateTimeMatch : ExtensionMatch("time") {
-    override val rank: Int = 50
+    override val weight: Int = 50
 
     private var useKernelTZ: Boolean = false
-    var start: Optional<DateTimeExtensionMatchOption>
-        private set
-    var end: Optional<DateTimeExtensionMatchOption>
-        private set
+    var start: DateTimeExtensionMatchOption?
+    var end: DateTimeExtensionMatchOption?
     private var contiguousFlag: Boolean
     var days: Array<DayOfWeek?>
     fun setContiguous() {
@@ -100,13 +98,13 @@ class DateTimeMatch : ExtensionMatch("time") {
     }
 
     fun setEnd(endTemporal: Temporal) {
-        end.ifPresent { throw IllegalStateException("end time is already set") }
-        end = Optional.of(EndDateTimeExtensionMatchOption(endTemporal))
+        end?.apply { throw IllegalStateException("end time is already set") }
+        end = EndDateTimeExtensionMatchOption(endTemporal)
     }
 
     fun setStart(startTemporal: Temporal) {
-        start.ifPresent { throw IllegalStateException("start time is already set") }
-        start = Optional.of(StartDateTimeExtensionMatchOption(startTemporal))
+        start?.apply { throw IllegalStateException("start time is already set") }
+        start = StartDateTimeExtensionMatchOption(startTemporal)
     }
 
     /**
@@ -114,14 +112,13 @@ class DateTimeMatch : ExtensionMatch("time") {
      */
     fun to(endTemporal: Temporal): DateTimeMatch {
         val newStringExtensionMatch = copy()
-        newStringExtensionMatch.end = Optional.of(EndDateTimeExtensionMatchOption(endTemporal))
+        newStringExtensionMatch.end = EndDateTimeExtensionMatchOption(endTemporal)
         return newStringExtensionMatch
     }
 
     fun from(startTemporal: Temporal): DateTimeMatch {
         val newStringExtensionMatch = copy()
-        newStringExtensionMatch.start =
-            Optional.of(StartDateTimeExtensionMatchOption(startTemporal))
+        newStringExtensionMatch.start = StartDateTimeExtensionMatchOption(startTemporal)
         return newStringExtensionMatch
     }
 
@@ -138,14 +135,16 @@ class DateTimeMatch : ExtensionMatch("time") {
 
     override fun asString(): String {
         val optionsStringBuilder = StringBuilder(128)
-        start.ifPresent { _start: DateTimeExtensionMatchOption ->
+
+        start?.apply {
             optionsStringBuilder.append(' ')
-            optionsStringBuilder.append(_start.asString())
+            optionsStringBuilder.append(this.asString())
         }
-        end.ifPresent { _end: DateTimeExtensionMatchOption ->
+        end?.apply {
             optionsStringBuilder.append(' ')
-            optionsStringBuilder.append(_end.asString())
+            optionsStringBuilder.append(this.asString())
         }
+
         val options = extensionMatchOptions!!
         if (!options.isEmpty()) {
             for (option in options) {
@@ -178,8 +177,8 @@ class DateTimeMatch : ExtensionMatch("time") {
     }
 
     init {
-        start = Optional.empty()
-        end = Optional.empty()
+        start = null
+        end = null
         contiguousFlag = false
         days = arrayOfNulls(0)
     }

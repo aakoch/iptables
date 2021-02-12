@@ -1,26 +1,24 @@
 package com.adamkoch.iptables
 
-import com.adamkoch.iptables.matches.*
-import com.adamkoch.iptables.objects.MacAddress
-import com.adamkoch.iptables.objects.Protocol
 import java.time.LocalTime
 
 class ChainBuilder(val name: String) {
-    val rules: MutableList<Rule> = mutableListOf()
-    val matches: MutableList<Match> = mutableListOf()
+    val rules: MutableList<com.adamkoch.iptables.Rule> = mutableListOf()
+    val matches: MutableList<com.adamkoch.iptables.matches.Match> = mutableListOf()
+    val separateMatches: MutableList<com.adamkoch.iptables.matches.Match> = mutableListOf()
 
-    fun returnIf(macAddress: MacAddress) : ChainBuilder {
-        val shortCircuitMacAddressMatch = MacAddressMatch(macAddress);
+    fun returnIf(macAddress: com.adamkoch.iptables.objects.MacAddress) : ChainBuilder {
+        val shortCircuitMacAddressMatch = com.adamkoch.iptables.matches.MacAddressMatch(macAddress);
         return returnIfInternal(shortCircuitMacAddressMatch)
     }
 
-    fun returnIfNot(macAddress: MacAddress) : ChainBuilder {
-        val shortCircuitMacAddressMatch = MacAddressMatch(macAddress).not();
+    fun returnIfNot(macAddress: com.adamkoch.iptables.objects.MacAddress) : ChainBuilder {
+        val shortCircuitMacAddressMatch = com.adamkoch.iptables.matches.MacAddressMatch(macAddress).not();
         return returnIfInternal(shortCircuitMacAddressMatch)
     }
 
-    private fun returnIfInternal(shortCircuitMacAddressMatch: Match): ChainBuilder {
-        val rule = Rule(Target.RETURN)
+    private fun returnIfInternal(shortCircuitMacAddressMatch: com.adamkoch.iptables.matches.Match): ChainBuilder {
+        val rule = com.adamkoch.iptables.Rule(com.adamkoch.iptables.Target.RETURN)
         rule.addMatch(shortCircuitMacAddressMatch)
         rules.add(rule)
         matches.clear()
@@ -45,15 +43,20 @@ class ChainBuilder(val name: String) {
         startMinute: Int,
         endHour: Int,
         endMinute: Int
-    ): DateTimeMatch {
-        val scheduleMatch = DateTimeMatch()
+    ): com.adamkoch.iptables.matches.DateTimeMatch {
+        val scheduleMatch = com.adamkoch.iptables.matches.DateTimeMatch()
         scheduleMatch.setStart(LocalTime.of(startHour, startMinute))
         scheduleMatch.setEnd(LocalTime.of(endHour, endMinute))
         return scheduleMatch
     }
 
-    fun ifContains(keyword: String): ChainBuilder {
-        matches.add(TcpKeywordMatch(keyword))
+    fun ifContains(keyword: String, routerIp: String): ChainBuilder {
+//        rules.add(Rule(name).also { it.addMatch(WebStringExtensionMatch(keyword)) })
+//        rules.add(Rule(name).also { it.addMatch(Udp1KeywordMatch(keyword)) })
+//        rules.add(Rule(name).also { it.addMatch(Udp2KeywordMatch(keyword, routerIp)) })
+        separateMatches.add(com.adamkoch.iptables.matches.TcpKeywordMatch(keyword))
+        separateMatches.add(com.adamkoch.iptables.matches.Udp1KeywordMatch(keyword))
+        separateMatches.add(com.adamkoch.iptables.matches.Udp2KeywordMatch(keyword, routerIp))
         return this
     }
 
@@ -63,12 +66,12 @@ class ChainBuilder(val name: String) {
 
     fun createString(): String {
 
-        val chain = Chain(Util.sanitize(this.name));
+        val chain = com.adamkoch.iptables.Chain(com.adamkoch.iptables.Util.sanitize(this.name));
         rules.forEach(chain::add)
         return chain.toString()
 
         val sb = StringBuilder()
-        val sanitizedChainName = Util.sanitize(this.name)
+        val sanitizedChainName = com.adamkoch.iptables.Util.sanitize(this.name)
         sb.append("# Creates a new user-defined chain named $sanitizedChainName")
         sb.append(System.lineSeparator())
         sb.append("iptables -N ")
@@ -95,20 +98,27 @@ class ChainBuilder(val name: String) {
     }
 
     fun rejectWithTcpReset(): ChainBuilder {
-        val rule = Rule(Target.REJECT_WITH_TCP_RESET)
-        matches.forEach(rule::addMatch)
-        rules.add(rule)
+
+
+        for(unfinishedRule in separateMatches.sorted()) {
+            val rule = com.adamkoch.iptables.Rule(com.adamkoch.iptables.Target.REJECT)
+            (matches + unfinishedRule).forEach(rule::addMatch)
+            rules.add(rule)
+        }
+
+//        separateMatches.map { rules.add(Rule(Target.REJECT_WITH_TCP_RESET).apply { this.addMatch(it);  } ) }
+
         matches.clear()
         return this
     }
 
     fun ifDestinationIp(s: String): ChainBuilder {
-        matches.add(DestinationMatch(s))
+        matches.add(com.adamkoch.iptables.matches.DestinationMatch(s))
         return this
     }
 
-    fun ifProtocol(protocol: Protocol): ChainBuilder {
-        matches.add(ProtocolMatch.match(protocol))
+    fun ifProtocol(protocol: com.adamkoch.iptables.objects.Protocol): ChainBuilder {
+        matches.add(com.adamkoch.iptables.matches.ProtocolMatch.Companion.match(protocol))
         return this
     }
 }

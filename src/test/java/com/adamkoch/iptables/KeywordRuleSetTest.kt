@@ -5,27 +5,31 @@ import com.adamkoch.iptables.matches.DateTimeMatch
 import com.adamkoch.iptables.matches.WebStringExtensionMatch
 import com.adamkoch.iptables.objects.MacAddress
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.LocalTime
 import kotlin.test.assertEquals
 
-internal class RuleSetTest {
+internal class KeywordRuleSetTest {
 
 
     @Test
     fun testRuleSet() {
         //  -m time --kerneltz --timestart 07:45 --timestop 11:00 --weekdays Mon,Tue,Wed,Thu,Fri
-        val ruleSet = RuleSet("discord", "FORWARD", MacAddress("00:00:00:00:01"), "255.255.255.255")
-        val actual = ruleSet.toString()
+        val ruleSet = KeywordRuleSet("discord", "255.255.255.255")
+
+
+        val actual = ruleSet.asString()
         Assertions.assertEquals(
-            """-p tcp -m webstr --url discord -m mac --mac-source 00:00:00:00:01 -j REJECT --reject-with tcp-reset
--i br0 -p udp -m udp --dport 53 -m string --string "discord" --algo bm --to 65535 --icase -m mac --mac-source 00:00:00:00:01 -j REJECT --reject-with tcp-reset
--d 255.255.255.255/32 -i br0 -p udp -m udp --dport 53 -m string --string "discord" --algo bm --to 65535 --icase -m mac --mac-source 00:00:00:00:01 -j REJECT --reject-with tcp-reset""",
+            """-p tcp -m webstr --url discord -j REJECT --reject-with tcp-reset
+-i br0 -p udp -m udp --dport 53 -m string --string "discord" --algo bm --to 65535 --icase -j REJECT
+-d 255.255.255.255/32 -i br0 -p udp -m udp --dport 53 -m string --string "discord" --algo bm --to 65535 --icase -j REJECT""",
             actual
         )
     }
 
     @Test
+    @Disabled("not finished")
     fun lunchBreakSchedule() {
         val multipleTimeRangesRuleSet = MultipleTimeRangesRuleSet()
         multipleTimeRangesRuleSet.run {

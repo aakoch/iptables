@@ -20,7 +20,7 @@ import java.util.Objects
  * @since 0.1.0
  */
 open class GenericMatch : Match {
-    override val rank: Int = 0
+    override val weight: Int = 0
 
     //  public static final GenericMatch EXPLICIT_MATCH = new GenericMatch("-m");
     private val flags: Array<String>

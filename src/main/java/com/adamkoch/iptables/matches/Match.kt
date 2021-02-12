@@ -7,7 +7,7 @@ package com.adamkoch.iptables.matches
  * @since 0.1.0
  */
 interface Match : Comparable<Match> {
-    abstract val rank: Int
+    abstract val weight: Int
 
     /**
      * Returns a string representation. I wanted to leave "toString()" as a method for outputting matches for developers
@@ -18,6 +18,6 @@ interface Match : Comparable<Match> {
     fun asString(): String
 
     override fun compareTo(other: Match): Int {
-        return other.rank - this.rank
+        return other.weight - this.weight
     }
 }
