@@ -8,4 +8,8 @@ class EndDateTimeExtensionMatchOption(endTemporal: Temporal) :
     override fun asString(): String {
         return super.asString(false)
     }
+
+    override fun toString(): String {
+        return "end[${temporal}]"
+    }
 }

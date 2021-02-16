@@ -66,13 +66,15 @@ import java.util.*
 class Main(private val properties: Properties) {
     private val tv1: Device
     private val tv2: Device
+
+
     private fun run() {
 
         val joelOmenChain = com.adamkoch.iptables.ChainBuilder("Joel's Omen")
             .returnIfNot(MacAddress(properties.getProperty("joel.omen.mac")))
             .ifBetweenLocal(8, 0, 11, 0)
-            .ifContains("discord", properties.getProperty("router.ip"))
-            .rejectWithTcpReset();
+            .ifContains("discord")
+            .reject();
 
         println(joelOmenChain)
 
@@ -91,13 +93,13 @@ class Main(private val properties: Properties) {
         val dropActionComponent = Target.DROP
         val returnMacNotMatching = createRule(returnActionComponent, match)
 
-        val (discordTcpMatch: Match, discordUdp1Match: Match, discordUdp2Match: Match) = keywordMatch(
+        val (discordTcpMatch: Match, discordUdp2Match: Match) = keywordMatch(
             joelsOmen,
             "discord",
             properties.getProperty("router.ip")
         )
 
-        val (eaTcpMatch: Match, eaUdp1Match: Match, eaUdp2Match: Match) = keywordMatch(
+        val (eaTcpMatch: Match, eaUdp2Match: Match) = keywordMatch(
             joelsOmen,
             "accounts.ea.com",
             properties.getProperty("router.ip")
@@ -107,11 +109,11 @@ class Main(private val properties: Properties) {
 
 
         val discordTcpRule = createRule(tcpRejectActionComponent, discordTcpMatch)
-        val discordUdp1Rule = createRule(udpRejectActionComponent, discordUdp1Match)
+//        val discordUdp1Rule = createRule(udpRejectActionComponent, discordUdp1Match)
         val discordUdp2Rule = createRule(udpRejectActionComponent, discordUdp2Match)
         joelsOmenChain.add(returnMacNotMatching)
         joelsOmenChain.add(discordTcpRule)
-        joelsOmenChain.add(discordUdp1Rule)
+//        joelsOmenChain.add(discordUdp1Rule)
         joelsOmenChain.add(discordUdp2Rule)
 
         val scriptWriter = ScriptWriter(CommandOption.APPEND)
@@ -162,12 +164,12 @@ class Main(private val properties: Properties) {
 //    writeToFile("Alyssa", rules);
     }
 
-    private fun keywordMatch(joelsOmen: Device, keyword: String, ipAddress: String?): Triple<Match, Match, Match> {
+    private fun keywordMatch(joelsOmen: Device, keyword: String, ipAddress: String?): List<Match> {
         val discordTcpMatch: Match = TcpKeywordMatch(keyword)
-        val discordUdp1Match: Match = Udp1KeywordMatch(keyword)
-        val discordUdp2Match: Match =
-            Udp2KeywordMatch(keyword, ipAddress + "/32")
-        return Triple(discordTcpMatch, discordUdp1Match, discordUdp2Match)
+//        val discordUdp1Match: Match = Udp1KeywordMatchSet(keyword)
+        val discordUdp2Match =
+            Udp2KeywordMatchSet(keyword, ipAddress + "/32")
+        return listOf(discordTcpMatch, *discordUdp2Match.getMatches().toTypedArray())
     }
 
     private fun createRule(target: Target, vararg matches: Match): Rule {
@@ -192,7 +194,7 @@ class Main(private val properties: Properties) {
         try {
             FileWriter(name.toLowerCase() + ".sh").use { fileWriter ->
                 for (chain in chains) {
-                    fileWriter.write(chain.toString() + System.lineSeparator())
+                    fileWriter.write(chain.asString() + System.lineSeparator())
                 }
             }
         } catch (e: IOException) {

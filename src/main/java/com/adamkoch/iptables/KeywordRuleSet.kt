@@ -21,17 +21,17 @@ class KeywordRuleSet(
 
     init {
         val tcpKeywordMatch = TcpKeywordMatch(keyword)
-        val keywordMatch2: Match = Udp1KeywordMatch(keyword)
-        val keywordMatch3: Match = Udp2KeywordMatch(keyword, "$routerIpAddress/32")
+        val keywordMatchSet = Udp1KeywordMatchSet(keyword)
+        val udpKeywordMatchSet = Udp2KeywordMatchSet(keyword, "$routerIpAddress/32")
 //        val macAddressMatchingComponent = MacAddressMatch(macAddress)
         val rule1 = Rule(Target.REJECT_WITH_TCP_RESET)
         rule1.addMatch(tcpKeywordMatch)
         rules.add(rule1)
         val rule2 = Rule(Target.REJECT)
-        rule2.addMatch(keywordMatch2)
+        rule2.addMatch(*keywordMatchSet.getMatches().toTypedArray())
         rules.add(rule2)
         val rule3 = Rule(Target.REJECT)
-        rule3.addMatch(keywordMatch3)
+        rule3.addMatch(*udpKeywordMatchSet.getMatches().toTypedArray())
         rules.add(rule3)
     }
 }

@@ -41,6 +41,9 @@ package com.adamkoch.iptables.matches
  */
 // TODO: probably need to do some validation on the keyword
 class StringExtensionMatch(private val keyword: String) : ExtensionMatch("string"), Invertible {
+
+    override val weight: Int = MatchWeight.KEYWORD.weight
+
     private var inverted = false
     override fun not(): StringExtensionMatch {
         val newStringExtensionMatch = copy()
@@ -48,9 +51,9 @@ class StringExtensionMatch(private val keyword: String) : ExtensionMatch("string
         return newStringExtensionMatch
     }
 
-    fun withAlgorithm(algorithm: String): StringExtensionMatch {
+    fun withAlgorithm(algorithm: AlgorithmExtensionMatchOption): StringExtensionMatch {
         val newStringExtensionMatch = copy()
-        newStringExtensionMatch.with(AlgorithmExtensionMatchOption(algorithm))
+        newStringExtensionMatch.with(algorithm)
         return newStringExtensionMatch
     }
 

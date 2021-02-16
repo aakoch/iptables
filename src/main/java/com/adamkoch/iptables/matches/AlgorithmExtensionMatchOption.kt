@@ -9,7 +9,7 @@ package com.adamkoch.iptables.matches
 class AlgorithmExtensionMatchOption @JvmOverloads constructor(private val algorithm: String = BOYER_MOORE) :
     GenericExtensionMatchOption("--algo") {
     override fun asString(): String {
-        return "--algo $algorithm"
+        return super.asString() + " " + algorithm
     }
 
     companion object {

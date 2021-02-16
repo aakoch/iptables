@@ -45,11 +45,16 @@ open class Rule(val target: Target) {
     //        device.getMacAddress(), keyword);
     //  }
     open fun asString(): String {
-        return matches.sorted().joinToString (" ", transform = Match::asString ) + " -j " + target.toString()
+//        println("matches unsorted" + matches.toString())
+//        println("matches sorted" + matches.sorted())
+        val str = matches.sorted()
+            .joinToString(" ", transform = Match::asString) + " -j " + target.toString()
+//        println("str=" + str)
+        // trim instances where we don't have any matches, only the target
+        return str.trim()
     }
 
     fun addMatch(vararg matches: Match) {
-
         for (match in matches) {
             this.matches.add(match)
         }

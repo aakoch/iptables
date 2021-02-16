@@ -24,7 +24,7 @@ internal class MainTest {
         chain.add(returnMacNotMatchingRule)
         Assertions.assertEquals(
             "$name -m mac ! --mac-source 00:00:00:00:00:00 -j RETURN",
-            chain.toString()
+            chain.asString()
         )
         val sc = ScriptWriter(CommandOption.APPEND)
         sc.add(chain)

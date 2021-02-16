@@ -7,47 +7,28 @@ import com.adamkoch.iptables.TimeRange
 import java.util.ArrayList
 
 /**
+ * A chain is a group of rules with a label.
+ *
+ * When creating a chain in iptables you would first run "iptables -N <chain name>" and then wire
+ * it to the INPUT and FORWARD targets:
+ * iptables -I INPUT -j <chain name>
+ * iptables -I FORWARD -j <chain name>
+ *
+ * This is, of course, an oversimplification.
  *
  * @since 0.1.0
  * @author aakoch
  */
-@Unstable
 class Chain(val name: String) {
-    private val rules: MutableList<Rule>
-    override fun toString(): String {
+    val rules: MutableList<Rule> = mutableListOf()
+
+    fun add(vararg rule: Rule) {
+        rules += rule
+    }
+
+    fun asString(): String {
         val sanitized = Util.sanitize(name)
-
-        return rules.stream().map { rule: Rule -> sanitized + " " + rule.asString() }
-            .collect(Collectors.joining(System.lineSeparator()))
-
-//    StringBuilder timeScheduleString = new StringBuilder();
-//    timeSchedule.ifPresent(ts -> {
-//      ts.getTimeRanges().forEach(timeRange -> {
-//        timeScheduleString.append("iptables -A " + sanitized + " -p tcp -m time --kerneltz --timestart " + timeRange.getStartTime() + " --timestop " + timeRange.getEndTime() + " -j REJECT\n");
-//      });
-//    });
-//
-//    return "iptables -N " + sanitized + "\n" +
-//    "iptables -I INPUT -j " + sanitized + "\n" +
-//    "iptables -I FORWARD -j " + sanitized + "\n" +
-//    "iptables -A " + sanitized + " -p tcp -m mac ! --mac-source " + device.get().getMacAddress() + " -j RETURN\n" +
-//
-////            // iptables -A Adam -p tcp -m time --kerneltz --timestart 18:45 --timestop 18:48 --weekdays Mon,Tue,Wed,Thu,Fri -j REJECT
-//
-//        timeScheduleString.toString() +
-////    "iptables -A " + sanitized + " -p tcp -m time --kerneltz --timestart 18:45 --timestop 18:48 --weekdays Mon,Tue,Wed,Thu,Fri -j REJECT\n"
-//        "iptables -A " + sanitized + " -j RETURN\n";
-    }
-
-    fun add(rule: Rule) {
-        rules.add(rule)
-    }
-
-    fun getRules(): List<Rule> {
-        return rules
-    }
-
-    init {
-        rules = ArrayList()
+        val s = rules.joinToString(System.lineSeparator()) { rule: Rule -> sanitized + " " + rule.asString() }
+        return s
     }
 }

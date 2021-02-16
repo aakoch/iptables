@@ -31,6 +31,8 @@ import com.adamkoch.iptables.matches.InInterfaceMatch
  * @since 0.1.0
  */
 class InInterfaceMatch(value: String?) : GenericMatch(FLAGS, value!!) {
+    override val weight: Int = MatchWeight.INTERFACE.weight
+
     companion object {
         private val FLAGS = arrayOf("-i", "--in-interface")
     }

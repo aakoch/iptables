@@ -23,7 +23,7 @@ internal class KeywordRuleSetTest {
         Assertions.assertEquals(
             """-p tcp -m webstr --url discord -j REJECT --reject-with tcp-reset
 -i br0 -p udp -m udp --dport 53 -m string --string "discord" --algo bm --to 65535 --icase -j REJECT
--d 255.255.255.255/32 -i br0 -p udp -m udp --dport 53 -m string --string "discord" --algo bm --to 65535 --icase -j REJECT""",
+-i br0 -p udp -m udp --dport 53 -d 255.255.255.255/32 -m string --string "discord" --algo bm --to 65535 --icase -j REJECT""",
             actual
         )
     }

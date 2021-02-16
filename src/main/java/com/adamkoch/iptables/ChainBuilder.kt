@@ -1,5 +1,6 @@
 package com.adamkoch.iptables
 
+import com.adamkoch.iptables.matches.*
 import java.time.LocalTime
 
 class ChainBuilder(val name: String) {
@@ -13,12 +14,12 @@ class ChainBuilder(val name: String) {
     }
 
     fun returnIfNot(macAddress: com.adamkoch.iptables.objects.MacAddress) : ChainBuilder {
-        val shortCircuitMacAddressMatch = com.adamkoch.iptables.matches.MacAddressMatch(macAddress).not();
+        val shortCircuitMacAddressMatch = MacAddressMatch(macAddress).not();
         return returnIfInternal(shortCircuitMacAddressMatch)
     }
 
-    private fun returnIfInternal(shortCircuitMacAddressMatch: com.adamkoch.iptables.matches.Match): ChainBuilder {
-        val rule = com.adamkoch.iptables.Rule(com.adamkoch.iptables.Target.RETURN)
+    private fun returnIfInternal(shortCircuitMacAddressMatch: Match): ChainBuilder {
+        val rule = Rule(Target.RETURN)
         rule.addMatch(shortCircuitMacAddressMatch)
         rules.add(rule)
         matches.clear()
@@ -50,13 +51,18 @@ class ChainBuilder(val name: String) {
         return scheduleMatch
     }
 
-    fun ifContains(keyword: String, routerIp: String): ChainBuilder {
+    fun ifContains(keyword: String): ChainBuilder {
 //        rules.add(Rule(name).also { it.addMatch(WebStringExtensionMatch(keyword)) })
 //        rules.add(Rule(name).also { it.addMatch(Udp1KeywordMatch(keyword)) })
 //        rules.add(Rule(name).also { it.addMatch(Udp2KeywordMatch(keyword, routerIp)) })
-        separateMatches.add(com.adamkoch.iptables.matches.TcpKeywordMatch(keyword))
-        separateMatches.add(com.adamkoch.iptables.matches.Udp1KeywordMatch(keyword))
-        separateMatches.add(com.adamkoch.iptables.matches.Udp2KeywordMatch(keyword, routerIp))
+        matches.add(TcpKeywordMatch(keyword))
+
+
+//        separateMatches.add(Udp1KeywordMatchSet(keyword))
+//        separateMatches.addAll(Udp2KeywordMatchSet(keyword, routerIp).getMatches())
+
+
+
         return this
     }
 
@@ -66,12 +72,12 @@ class ChainBuilder(val name: String) {
 
     fun createString(): String {
 
-        val chain = com.adamkoch.iptables.Chain(com.adamkoch.iptables.Util.sanitize(this.name));
+        val chain = Chain(Util.sanitize(this.name));
         rules.forEach(chain::add)
-        return chain.toString()
+        return chain.asString()
 
         val sb = StringBuilder()
-        val sanitizedChainName = com.adamkoch.iptables.Util.sanitize(this.name)
+        val sanitizedChainName = Util.sanitize(this.name)
         sb.append("# Creates a new user-defined chain named $sanitizedChainName")
         sb.append(System.lineSeparator())
         sb.append("iptables -N ")
@@ -97,19 +103,32 @@ class ChainBuilder(val name: String) {
         return sb.toString()
     }
 
-    fun rejectWithTcpReset(): ChainBuilder {
+    fun reject(): ChainBuilder {
 
+        val rule = Rule(Target.REJECT)
 
-        for(unfinishedRule in separateMatches.sorted()) {
-            val rule = com.adamkoch.iptables.Rule(com.adamkoch.iptables.Target.REJECT)
-            (matches + unfinishedRule).forEach(rule::addMatch)
-            rules.add(rule)
+        for (match in matches.sorted()) {
+            rule.addMatch(match)
         }
 
-//        separateMatches.map { rules.add(Rule(Target.REJECT_WITH_TCP_RESET).apply { this.addMatch(it);  } ) }
+        rules.add(rule)
 
-        matches.clear()
         return this
+
+//        for(match in separateMatches.sorted()) {
+//            val rule = Rule(Target.REJECT)
+//            rule.addMatch(match)
+//            rule.addMatch(*matches.toTypedArray())
+//            rules.add(rule)
+//        }
+//
+////        separateMatches.map { rules.add(Rule(Target.REJECT_WITH_TCP_RESET).apply { this.addMatch(it);  } ) }
+//
+//        matches.clear()
+//
+//        val chain = Chain(name)
+//        chain.add(* rules.toTypedArray())
+//        return chain
     }
 
     fun ifDestinationIp(s: String): ChainBuilder {
@@ -118,7 +137,39 @@ class ChainBuilder(val name: String) {
     }
 
     fun ifProtocol(protocol: com.adamkoch.iptables.objects.Protocol): ChainBuilder {
-        matches.add(com.adamkoch.iptables.matches.ProtocolMatch.Companion.match(protocol))
+        matches.add(ProtocolMatch.valueOf(protocol))
+        return this
+    }
+
+    fun rule(rule: Rule): ChainBuilder {
+        rules.add(rule)
+        return this
+    }
+
+    fun build(): Chain {
+        val chain = Chain(name)
+        chain.add(*rules.toTypedArray())
+        return chain
+    }
+
+    fun rejectWithTcpReset(): ChainBuilder {
+        val rule = Rule(Target.REJECT_WITH_TCP_RESET)
+
+        for (match in matches.sorted()) {
+            rule.addMatch(match)
+        }
+
+        rules.add(rule)
+        return this
+    }
+
+    fun udpContains(keyword: String): ChainBuilder {
+        matches.addAll(Udp1KeywordMatchSet(keyword).getMatches())
+        return this
+    }
+
+    fun udp2Contains(keyword: String, ipAddress: String): ChainBuilder {
+        matches.addAll(Udp2KeywordMatchSet(keyword, ipAddress).getMatches())
         return this
     }
 }

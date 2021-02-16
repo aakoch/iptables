@@ -86,7 +86,7 @@ import java.util.*
 // TODO: this needs work/more thought. Are we allowing for open-ended matches? We should. Instead of having separate start and end just have options? Hmm...
 // Nail down the relationship with DateTimeExtensionMatchOption. Hint: why do both have useKernelTZ?
 class DateTimeMatch : ExtensionMatch("time") {
-    override val weight: Int = 50
+    override val weight: Int = MatchWeight.TIME.weight
 
     private var useKernelTZ: Boolean = false
     var start: DateTimeExtensionMatchOption?
@@ -181,5 +181,9 @@ class DateTimeMatch : ExtensionMatch("time") {
         end = null
         contiguousFlag = false
         days = arrayOfNulls(0)
+    }
+
+    override fun toString(): String {
+        return "DateTimeMatch[$start-$end]"
     }
 }

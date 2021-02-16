@@ -23,9 +23,7 @@ class MacAddress(private val addr: String) {
 
     init {
         Objects.requireNonNull(addr)
-        if (!addr.chars().allMatch { it > 32 && it < 127 })
-            throw IllegalArgumentException("Invalid MAC Address \"$addr\"")
-        if (addr.length > 50)
-            throw IllegalArgumentException("Invalid MAC Address \"$addr\"")
+        if (!addr.chars().allMatch { it > 32 && it < 127 } || addr.length > 17 || addr.isBlank())
+            throw IllegalArgumentException("Invalid MAC Address")
     }
 }

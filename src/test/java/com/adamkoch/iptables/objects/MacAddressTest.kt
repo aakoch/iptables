@@ -1,30 +1,42 @@
 package com.adamkoch.iptables.objects
 
 import org.apache.commons.lang3.RandomStringUtils
-import org.apache.commons.lang3.RandomUtils
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Test
-import java.lang.IllegalArgumentException
-import java.util.*
+import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
+import kotlin.test.assertEquals
 
 internal class MacAddressTest {
+    private companion object {
+        @JvmStatic
+        fun validAddresses() = arrayOf(
+            MacAddress.DUMMY.toString(),
+            "3D-F2-C9-A6-B3:4F",
+            "3DF-2C9-A6B-34F",
+            "3D.F2.C9.A6.B3.4F"
+        )
 
-    @Test
-    fun valid() {
-        MacAddress(MacAddress.DUMMY.toString())
+        @JvmStatic
+        fun invalidAddresses() = arrayOf(
+            "\u0001\u0002",
+            "\u0127",
+            "",
+            RandomStringUtils.random(30)
+        )
     }
 
-    @Test
-    fun invalid() {
-        m("ab:cd:00:\u0110\u0100:11")
-        m("\u0001\u0002")
-        m("\u0127")
-        m(RandomStringUtils.random(3000))
+    @ParameterizedTest(name = "\"{0}\" is a valid MAC address and should not throw an exception")
+    @MethodSource("validAddresses")
+    fun parameterizedValid(macAddress: String) {
+        MacAddress(macAddress)
     }
 
-    private fun m(str: String) {
-        assertThrows(IllegalArgumentException::class.java, {
-            MacAddress(str)
-        })
+    @ParameterizedTest(name = "\"{0}\" is an invalid MAC address and should throw an exception")
+    @MethodSource("invalidAddresses")
+    fun parameterizedInvalid(macAddress: String) {
+        val exception = assertThrows<IllegalArgumentException>("\"$macAddress\" is invalid and should throw an IllegalArgumentException") {
+            MacAddress(macAddress)
+        }
+        assertEquals("Invalid MAC Address", exception.message)
     }
 }

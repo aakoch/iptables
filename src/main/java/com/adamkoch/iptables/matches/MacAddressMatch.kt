@@ -10,7 +10,7 @@ import com.adamkoch.iptables.matches.MacAddressMatch
  * @constructor Create empty Mac address match
  */
 class MacAddressMatch(private val macAddress: MacAddress) : Match {
-    override val weight: Int = 0
+    override val weight: Int = MatchWeight.MAC_ADDRESS.weight
     private var inverseFlag = false
 
     /**
@@ -26,5 +26,9 @@ class MacAddressMatch(private val macAddress: MacAddress) : Match {
 
     override fun asString(): String {
         return "-m mac " + (if (inverseFlag) "! " else "") + "--mac-source " + macAddress
+    }
+
+    override fun toString(): String {
+        return "MacAddress[$macAddress]"
     }
 }

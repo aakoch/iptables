@@ -34,7 +34,7 @@ class ScriptWriter(val appendInsertDelete: CommandOption) {
             sb.append("iptables -I FORWARD -j ")
             sb.append(sanitizedChainName)
             sb.append(System.lineSeparator())
-            for (rule in chain.getRules()) {
+            for (rule in chain.rules) {
                 sb.append("iptables -$appendInsertDelete ")
                 sb.append(sanitizedChainName)
                 sb.append(" ")

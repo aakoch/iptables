@@ -25,25 +25,24 @@ import java.util.*
  * @since 0.1.0
  */
 class ProtocolMatch private constructor(private val protocol: Protocol) : Match {
-    override val weight: Int = 1000
+    override val weight: Int = MatchWeight.PROTOCOL.weight
 
     override fun asString(): String {
         return "-p ${protocol.name.toLowerCase(Locale.ENGLISH)}"
     }
 
+    override fun toString(): String {
+        return "ProtocolMatch." + protocol.name
+    }
 
     companion object {
-        fun match(protocol: Protocol): ProtocolMatch {
-            return if (protocol == Protocol.ICMP)
-                ICMP
-            else if (protocol == Protocol.TCP)
-                TCP
-            else if (protocol == Protocol.IP)
-                IP
-            else if (protocol == Protocol.UDP)
-                UDP
-            else
-                TCP
+        fun valueOf(protocol: Protocol): Match {
+            return when (protocol) {
+                Protocol.ICMP -> ICMP
+                Protocol.TCP -> TCP
+                Protocol.IP -> IP
+                Protocol.UDP -> UDP
+            }
         }
 
         @JvmField val ICMP = ProtocolMatch(Protocol.ICMP)

@@ -8,4 +8,8 @@ class StartDateTimeExtensionMatchOption(startTemporal: Temporal) :
     override fun asString(): String {
         return super.asString(true)
     }
+
+    override fun toString(): String {
+        return "start[${temporal}]"
+    }
 }
